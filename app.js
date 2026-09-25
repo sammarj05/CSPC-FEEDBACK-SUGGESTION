@@ -38,6 +38,17 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const app = express();
 
 // ---------------------------------------------------------------
+// Trust the first proxy (Render, Heroku, Railway, etc.)
+// Required so that secure session cookies work correctly when the
+// platform terminates HTTPS at a reverse proxy and forwards HTTP
+// to the app. Without this, req.secure is always false in
+// production and `secure: true` cookies are never sent.
+// ---------------------------------------------------------------
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
+// ---------------------------------------------------------------
 // View engine
 // ---------------------------------------------------------------
 app.set("view engine", "ejs");
