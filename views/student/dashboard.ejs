@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'dashboard' }) %>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">My Dashboard</h1>
+      <p class="page-header__subtitle">Welcome back, <strong><%= user.name %></strong></p>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+
+    <!-- Flash messages -->
+    <% if (typeof flashSuccess !== 'undefined' && flashSuccess && flashSuccess.length > 0) { %>
+      <div class="flash flash--success" role="alert" aria-live="polite">
+        <span aria-hidden="true">✓</span> <%- flashSuccess[0] %>
+        <button class="flash__close" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+      </div>
+    <% } %>
+
+    <!-- Stat cards — all sourced from database -->
+    <div class="stats-grid" aria-label="Feedback statistics">
+      <div class="stat-card">
+        <div class="stat-card__value" aria-label="Total submissions: <%= stats.total || 0 %>"><%= stats.total || 0 %></div>
+        <div class="stat-card__label">Total Submissions</div>
+      </div>
+      <div class="stat-card stat-card--blue">
+        <div class="stat-card__value"><%= stats.submitted || 0 %></div>
+        <div class="stat-card__label">Submitted</div>
+      </div>
+      <div class="stat-card stat-card--amber">
+        <div class="stat-card__value"><%= stats.under_review || 0 %></div>
+        <div class="stat-card__label">Under Review</div>
+      </div>
+      <div class="stat-card stat-card--purple">
+        <div class="stat-card__value"><%= stats.in_progress || 0 %></div>
+        <div class="stat-card__label">In Progress</div>
+      </div>
+      <div class="stat-card stat-card--green">
+        <div class="stat-card__value"><%= stats.resolved || 0 %></div>
+        <div class="stat-card__label">Resolved</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="dashboard-actions">
+      <a href="/feedback/new" class="btn btn--primary" id="dashSubmitBtn">+ Submit New Feedback</a>
+      <a href="/feedback" class="btn btn--secondary" id="dashViewAllBtn">View All Submissions</a>
+    </div>
+
+    <!-- Recent Submissions -->
+    <section aria-labelledby="recentHeading">
+      <h2 class="section-title" id="recentHeading">Recent Submissions</h2>
+
+      <% if (recentFeedback.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-state__icon" aria-hidden="true">📭</div>
+          <h3 class="empty-state__title">No submissions yet</h3>
+          <p class="empty-state__text">You have not submitted any feedback. Share your thoughts to help improve CSPC.</p>
+          <a href="/feedback/new" class="btn btn--primary">Submit Your First Feedback</a>
+        </div>
+      <% } else { %>
+        <div class="table-wrapper" role="region" aria-label="Recent feedback submissions" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Reference #</th>
+                <th scope="col">Subject</th>
+                <th scope="col">Category</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentFeedback.forEach(function(fb) { %>
+                <tr>
+                  <td><code class="ref-num"><%= fb.reference_number %></code></td>
+                  <td class="td--subject"><%= fb.subject %></td>
+                  <td><%= fb.category_name %></td>
+                  <td><%- include('../partials/status-badge', { status: fb.status }) %></td>
+                  <td><time datetime="<%= fb.created_at %>"><%= new Date(fb.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) %></time></td>
+                  <td><a href="/feedback/<%= fb.id %>" class="table-link">View</a></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+        <% if (recentFeedback.length >= 5) { %>
+          <p class="dashboard-more"><a href="/feedback">View all submissions →</a></p>
+        <% } %>
+      <% } %>
+    </section>
+
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

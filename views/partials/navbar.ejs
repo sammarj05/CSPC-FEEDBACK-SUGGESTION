@@ -1,0 +1,53 @@
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="container navbar__inner">
+
+    <!-- Brand -->
+    <a href="/" class="navbar__brand" aria-label="CSPC Feedback System home">
+      <div class="navbar__logo-mark" aria-hidden="true">CSPC</div>
+      <div class="navbar__brand-text">
+        <span class="navbar__brand-title">Feedback System</span>
+        <span class="navbar__brand-sub">Camarines Sur Polytechnic Colleges</span>
+      </div>
+    </a>
+
+    <!-- Mobile hamburger -->
+    <button class="navbar__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Toggle navigation menu">
+      <span class="navbar__toggle-bar"></span>
+      <span class="navbar__toggle-bar"></span>
+      <span class="navbar__toggle-bar"></span>
+    </button>
+
+    <!-- Nav links -->
+    <div class="navbar__menu" id="navMenu">
+      <% if (currentUser) { %>
+
+        <% if (currentUser.role === 'student') { %>
+          <a href="/student/dashboard" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'dashboard') { %>navbar__link--active<% } %>">Dashboard</a>
+          <a href="/feedback" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'my-feedback') { %>navbar__link--active<% } %>">My Submissions</a>
+          <a href="/feedback/new" class="navbar__link navbar__link--cta">Submit Feedback</a>
+        <% } %>
+
+        <% if (currentUser.role === 'admin') { %>
+          <a href="/admin/dashboard" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'admin-dashboard') { %>navbar__link--active<% } %>">Dashboard</a>
+          <a href="/admin/feedback" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'admin-feedback') { %>navbar__link--active<% } %>">Feedback</a>
+        <% } %>
+
+        <!-- User info + logout -->
+        <div class="navbar__user">
+          <span class="navbar__user-name" aria-label="Logged in as <%= currentUser.name %>">
+            <span class="navbar__user-avatar" aria-hidden="true"><%= currentUser.name.charAt(0).toUpperCase() %></span>
+            <%= currentUser.name %>
+          </span>
+          <form action="/auth/logout" method="POST" class="navbar__logout-form">
+            <button type="submit" class="navbar__logout-btn" id="logoutBtn">Log Out</button>
+          </form>
+        </div>
+
+      <% } else { %>
+        <a href="/auth/login" class="navbar__link">Log In</a>
+        <a href="/auth/register" class="navbar__link navbar__link--cta">Create Account</a>
+      <% } %>
+    </div>
+
+  </div>
+</nav>

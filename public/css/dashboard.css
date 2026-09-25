@@ -1,0 +1,111 @@
+/* =============================================================
+   CSPC Feedback System — Dashboard Styles
+   dashboard.css
+   ============================================================= */
+
+/* ------------------------------------------------------------------
+   Stat Cards
+------------------------------------------------------------------ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+  border-top: 3px solid #e2e8f0;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+
+.stat-card--blue   { border-top-color: #3b82f6; }
+.stat-card--amber  { border-top-color: #f59e0b; }
+.stat-card--purple { border-top-color: #8b5cf6; }
+.stat-card--green  { border-top-color: #10b981; }
+.stat-card--gray   { border-top-color: #94a3b8; }
+
+.stat-card__value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card__label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ------------------------------------------------------------------
+   Charts / Bar list
+------------------------------------------------------------------ */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.chart-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+.chart-card__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bar-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.bar-list__item {
+  display: grid;
+  grid-template-columns: 140px 1fr 40px;
+  gap: 0.75rem;
+  align-items: center;
+}
+.bar-list__label {
+  font-size: 0.8rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bar-list__track {
+  background: #f1f5f9;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+.bar-list__fill {
+  height: 100%;
+  background: #1a56db;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bar-list__fill--alt { background: #8b5cf6; }
+.bar-list__count { font-size: 0.8rem; font-weight: 600; color: #0f172a; text-align: right; }
+
+/* ------------------------------------------------------------------
+   Responsive chart adjustments
+------------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .charts-row { grid-template-columns: 1fr; }
+  .bar-list__item { grid-template-columns: 100px 1fr 36px; }
+}

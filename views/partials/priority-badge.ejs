@@ -1,0 +1,10 @@
+<%# partials/priority-badge.ejs %>
+<%
+  const priorityMap = {
+    low:    { label: 'Low',    cls: 'priority--low'    },
+    medium: { label: 'Medium', cls: 'priority--medium' },
+    high:   { label: 'High',   cls: 'priority--high'   },
+  };
+  const pInfo = priorityMap[priority] || { label: priority, cls: '' };
+%>
+<span class="priority-badge <%= pInfo.cls %>" aria-label="Priority: <%= pInfo.label %>"><%= pInfo.label %></span>

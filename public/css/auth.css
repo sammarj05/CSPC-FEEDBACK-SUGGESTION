@@ -1,0 +1,129 @@
+/* =============================================================
+   CSPC Feedback System — Auth Page Styles
+   auth.css
+   ============================================================= */
+
+.auth-body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1a56db 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 480px;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.4);
+}
+
+.auth-card__header { text-align: center; margin-bottom: 2rem; }
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+.auth-brand__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  background: #1a56db;
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border-radius: 0.5rem;
+  letter-spacing: 0.05em;
+}
+.auth-brand__title { font-size: 0.95rem; font-weight: 600; color: #0f172a; display: block; line-height: 1.2; }
+.auth-brand__sub   { font-size: 0.7rem;  color: #64748b; display: block; line-height: 1.2; }
+
+.auth-card__title    { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 0.25rem; }
+.auth-card__subtitle { font-size: 0.875rem; color: #64748b; }
+
+.auth-form { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem; }
+
+.auth-card__footer-text { text-align: center; font-size: 0.875rem; color: #64748b; }
+.auth-link { font-weight: 500; color: #1a56db; }
+.auth-link:hover { color: #1043b0; }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 1.75rem 1.25rem; }
+}
+
+/* ------------------------------------------------------------------
+   Google OAuth section
+------------------------------------------------------------------ */
+.oauth-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.btn--google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.65rem 1.5rem;
+  background: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 0.5rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.15);
+}
+.btn--google:hover {
+  background: #f8f9fa;
+  box-shadow: 0 2px 6px 0 rgba(60,64,67,0.25);
+  color: #3c4043;
+}
+.btn--google:focus-visible {
+  outline: 3px solid #1a56db;
+  outline-offset: 2px;
+}
+.btn-google__icon { flex-shrink: 0; }
+
+.oauth-note {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------
+   Divider between OAuth and manual form
+------------------------------------------------------------------ */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+

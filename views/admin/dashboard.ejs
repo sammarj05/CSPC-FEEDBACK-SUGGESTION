@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'admin-dashboard' }) %>
+
+  <div class="page-header page-header--admin">
+    <div class="container">
+      <h1 class="page-header__title">Admin Dashboard</h1>
+      <p class="page-header__subtitle">System overview — Camarines Sur Polytechnic Colleges</p>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+
+    <!-- Status stat cards — all from database -->
+    <div class="stats-grid" aria-label="Feedback statistics">
+      <div class="stat-card">
+        <div class="stat-card__value"><%= stats.overall.total || 0 %></div>
+        <div class="stat-card__label">Total Feedback</div>
+      </div>
+      <div class="stat-card stat-card--blue">
+        <div class="stat-card__value"><%= stats.overall.submitted || 0 %></div>
+        <div class="stat-card__label">Submitted</div>
+      </div>
+      <div class="stat-card stat-card--amber">
+        <div class="stat-card__value"><%= stats.overall.under_review || 0 %></div>
+        <div class="stat-card__label">Under Review</div>
+      </div>
+      <div class="stat-card stat-card--purple">
+        <div class="stat-card__value"><%= stats.overall.in_progress || 0 %></div>
+        <div class="stat-card__label">In Progress</div>
+      </div>
+      <div class="stat-card stat-card--green">
+        <div class="stat-card__value"><%= stats.overall.resolved || 0 %></div>
+        <div class="stat-card__label">Resolved</div>
+      </div>
+      <div class="stat-card stat-card--gray">
+        <div class="stat-card__value"><%= stats.overall.closed || 0 %></div>
+        <div class="stat-card__label">Closed</div>
+      </div>
+    </div>
+
+    <!-- Quick action -->
+    <div class="dashboard-actions">
+      <a href="/admin/feedback" class="btn btn--primary" id="adminViewAllBtn">View All Feedback</a>
+      <a href="/admin/feedback?status=submitted" class="btn btn--secondary" id="adminViewNewBtn">View New Submissions</a>
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+
+      <!-- By Category -->
+      <section class="chart-card" aria-labelledby="byCatHeading">
+        <h2 class="chart-card__title" id="byCatHeading">Feedback by Category</h2>
+        <% if (stats.byCategory.length === 0) { %>
+          <p class="empty-inline">No feedback data yet.</p>
+        <% } else { %>
+          <ul class="bar-list" aria-label="Feedback count per category">
+            <% const maxCat = Math.max(...stats.byCategory.map(r => r.count), 1); %>
+            <% stats.byCategory.forEach(function(row) { %>
+              <li class="bar-list__item">
+                <span class="bar-list__label"><%= row.category %></span>
+                <div class="bar-list__track" role="progressbar" aria-valuenow="<%= row.count %>" aria-valuemin="0" aria-valuemax="<%= maxCat %>" aria-label="<%= row.category %>: <%= row.count %> feedback">
+                  <div class="bar-list__fill" style="width: <%= Math.round((row.count / maxCat) * 100) %>%"></div>
+                </div>
+                <span class="bar-list__count"><%= row.count %></span>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </section>
+
+      <!-- By Type -->
+      <section class="chart-card" aria-labelledby="byTypeHeading">
+        <h2 class="chart-card__title" id="byTypeHeading">Feedback by Type</h2>
+        <% if (stats.byType.length === 0) { %>
+          <p class="empty-inline">No feedback data yet.</p>
+        <% } else { %>
+          <ul class="bar-list" aria-label="Feedback count per type">
+            <% const maxType = Math.max(...stats.byType.map(r => r.count), 1); %>
+            <% stats.byType.forEach(function(row) { %>
+              <li class="bar-list__item">
+                <span class="bar-list__label"><%= row.type.replace(/_/g,' ') %></span>
+                <div class="bar-list__track" role="progressbar" aria-valuenow="<%= row.count %>" aria-valuemin="0" aria-valuemax="<%= maxType %>">
+                  <div class="bar-list__fill bar-list__fill--alt" style="width: <%= Math.round((row.count / maxType) * 100) %>%"></div>
+                </div>
+                <span class="bar-list__count"><%= row.count %></span>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </section>
+
+    </div>
+
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

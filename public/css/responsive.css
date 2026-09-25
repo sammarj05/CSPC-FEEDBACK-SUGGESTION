@@ -1,0 +1,145 @@
+/* =============================================================
+   CSPC Feedback System — Responsive Styles
+   responsive.css
+   ============================================================= */
+
+/* ------------------------------------------------------------------
+   Tablet: ≤ 1024px
+------------------------------------------------------------------ */
+@media (max-width: 1024px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero__visual { display: none; }
+  .hero__actions { justify-content: center; }
+
+  .features__grid { grid-template-columns: 1fr 1fr; }
+
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .detail-sidebar { order: -1; } /* timeline above on tablet */
+
+  .charts-row { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------------
+   Mobile: ≤ 768px
+------------------------------------------------------------------ */
+@media (max-width: 768px) {
+
+  /* Navbar mobile */
+  .navbar__toggle { display: flex; }
+
+  .navbar__menu {
+    display: none;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0; right: 0;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4) var(--space-6);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    box-shadow: var(--shadow-md);
+    z-index: 99;
+  }
+  .navbar__menu.is-open { display: flex; }
+
+  .navbar__user {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    padding-left: 0;
+    padding-top: var(--space-3);
+    margin-left: 0;
+    margin-top: var(--space-2);
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  /* Navbar position context for dropdown */
+  .navbar { position: relative; }
+
+  /* Hero */
+  .hero { min-height: auto; padding-block: var(--space-12); }
+  .hero__title { font-size: 1.75rem; }
+  .hero__subtitle { font-size: 0.95rem; }
+  .hero__actions { flex-direction: column; align-items: center; }
+  .hero__actions .btn { width: 100%; max-width: 280px; }
+
+  /* Features */
+  .features__grid { grid-template-columns: 1fr; }
+
+  /* Forms */
+  .form-row { grid-template-columns: 1fr; }
+  .form-card { padding: var(--space-5); }
+  .priority-group { flex-wrap: wrap; }
+  .form-row--compact { flex-direction: column; }
+
+  /* Tables */
+  .table th, .table td { padding: var(--space-2) var(--space-3); }
+  .table th:nth-child(4),
+  .table td:nth-child(4),
+  .table th:nth-child(5),
+  .table td:nth-child(5) { display: none; } /* hide less important cols on mobile */
+
+  /* Filter form */
+  .filter-row { flex-direction: column; }
+  .filter-group { width: 100%; }
+  .filter-group--actions { flex-direction: row; }
+
+  /* Stats grid */
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Dashboard actions */
+  .dashboard-actions { flex-direction: column; }
+  .dashboard-actions .btn { width: 100%; }
+
+  /* Page header */
+  .page-header__row { flex-direction: column; gap: var(--space-3); }
+
+  /* Detail */
+  .detail-item { flex-direction: column; gap: var(--space-1); }
+  .detail-item dt { min-width: unset; }
+
+  /* Response header */
+  .response-item__header { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+
+  /* Pagination */
+  .pagination { flex-direction: column; gap: var(--space-2); }
+
+  /* Auth card */
+  .auth-card { padding: 1.5rem 1rem; }
+
+  /* Bar list */
+  .bar-list__item { grid-template-columns: 90px 1fr 30px; }
+
+  /* Section */
+  .section { padding-block: var(--space-10); }
+}
+
+/* ------------------------------------------------------------------
+   Small mobile: ≤ 480px
+------------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .container { padding-inline: var(--space-4); }
+  .stats-grid { grid-template-columns: 1fr; }
+  .hero__title { font-size: 1.5rem; }
+  .table th:nth-child(3),
+  .table td:nth-child(3) { display: none; }
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion
+------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

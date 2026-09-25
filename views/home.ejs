@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CSPC Suggestion and Feedback System — Submit and track feedback at Camarines Sur Polytechnic Colleges." />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('partials/navbar') %>
+
+  <!-- Hero Section -->
+  <section class="hero" aria-labelledby="heroHeading">
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <span class="hero__eyebrow">Camarines Sur Polytechnic Colleges</span>
+        <h1 class="hero__title" id="heroHeading">Your Voice Matters</h1>
+        <p class="hero__subtitle">
+          Submit suggestions, complaints, concerns, and feedback to help improve
+          the CSPC experience for every student.
+        </p>
+        <div class="hero__actions">
+          <% if (user) { %>
+            <a href="/feedback/new" class="btn btn--primary btn--lg" id="heroSubmitBtn">Submit Feedback</a>
+            <% if (user.role === 'student') { %>
+              <a href="/student/dashboard" class="btn btn--ghost btn--lg">My Dashboard</a>
+            <% } else { %>
+              <a href="/admin/dashboard" class="btn btn--ghost btn--lg">Admin Dashboard</a>
+            <% } %>
+          <% } else { %>
+            <a href="/auth/register" class="btn btn--primary btn--lg" id="heroRegisterBtn">Get Started</a>
+            <a href="/auth/login" class="btn btn--ghost btn--lg" id="heroLoginBtn">Log In</a>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="hero__visual" aria-hidden="true">
+        <div class="hero__card hero__card--1">
+          <span class="badge badge--submitted">Submitted</span>
+          <p>Classroom air-conditioning unit on Room 301 needs repair.</p>
+        </div>
+        <div class="hero__card hero__card--2">
+          <span class="badge badge--resolved">✓ Resolved</span>
+          <p>Request for additional library reference materials.</p>
+        </div>
+        <div class="hero__card hero__card--3">
+          <span class="badge badge--in-progress">In Progress</span>
+          <p>WiFi connectivity issues in the engineering building.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features section" aria-labelledby="featuresHeading">
+    <div class="container">
+      <h2 class="section__title" id="featuresHeading">How It Works</h2>
+      <p class="section__subtitle">A simple, transparent process for every feedback.</p>
+
+      <div class="features__grid">
+        <div class="feature-card">
+          <div class="feature-card__icon" aria-hidden="true">📝</div>
+          <h3 class="feature-card__title">1. Submit</h3>
+          <p class="feature-card__desc">Create an account and submit your feedback, suggestion, or concern. Choose from categories relevant to your experience at CSPC.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon" aria-hidden="true">🔍</div>
+          <h3 class="feature-card__title">2. Track</h3>
+          <p class="feature-card__desc">Every submission receives a unique reference number. Monitor the status of your feedback in real time from your personal dashboard.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon" aria-hidden="true">💬</div>
+          <h3 class="feature-card__title">3. Receive Response</h3>
+          <p class="feature-card__desc">Authorized CSPC personnel review and respond directly to your feedback. You will see official responses on your feedback detail page.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories section section--alt" aria-labelledby="categoriesHeading">
+    <div class="container">
+      <h2 class="section__title" id="categoriesHeading">Feedback Categories</h2>
+      <div class="categories__grid">
+        <div class="category-chip">📚 Academic</div>
+        <div class="category-chip">🏛️ Facilities</div>
+        <div class="category-chip">🎓 Student Services</div>
+        <div class="category-chip">👨‍🏫 Faculty</div>
+        <div class="category-chip">🏫 Administration</div>
+        <div class="category-chip">💻 Technology</div>
+        <div class="category-chip">🛡️ Campus Safety</div>
+        <div class="category-chip">📅 Events</div>
+        <div class="category-chip">💡 Other</div>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

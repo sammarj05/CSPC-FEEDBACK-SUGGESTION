@@ -1,0 +1,12 @@
+<%# partials/status-badge.ejs — renders an accessible status badge %>
+<%
+  const statusMap = {
+    submitted:    { label: 'Submitted',    cls: 'badge--submitted'  },
+    under_review: { label: 'Under Review', cls: 'badge--review'     },
+    in_progress:  { label: 'In Progress',  cls: 'badge--progress'   },
+    resolved:     { label: 'Resolved',     cls: 'badge--resolved'   },
+    closed:       { label: 'Closed',       cls: 'badge--closed'     },
+  };
+  const info = statusMap[status] || { label: status, cls: '' };
+%>
+<span class="badge <%= info.cls %>" aria-label="Status: <%= info.label %>"><%= info.label %></span>

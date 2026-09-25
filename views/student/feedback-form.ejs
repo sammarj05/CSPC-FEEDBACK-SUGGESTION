@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'my-feedback' }) %>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">Submit Feedback</h1>
+      <p class="page-header__subtitle">Share your thoughts with CSPC</p>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+
+    <%- include('../partials/errors') %>
+
+    <div class="form-card">
+      <form action="/feedback" method="POST" class="feedback-form" novalidate id="feedbackForm">
+
+        <!-- Row: Type + Category -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="type">Feedback Type <span class="form-required" aria-label="required">*</span></label>
+            <select id="type" name="type" class="form-select" required aria-required="true">
+              <option value="">— Select type —</option>
+              <option value="suggestion"       <%= (formData.type === 'suggestion')        ? 'selected' : '' %>>💡 Suggestion</option>
+              <option value="complaint"        <%= (formData.type === 'complaint')         ? 'selected' : '' %>>⚠️ Complaint</option>
+              <option value="concern"          <%= (formData.type === 'concern')           ? 'selected' : '' %>>❓ Concern</option>
+              <option value="general_feedback" <%= (formData.type === 'general_feedback')  ? 'selected' : '' %>>💬 General Feedback</option>
+              <option value="appreciation"     <%= (formData.type === 'appreciation')      ? 'selected' : '' %>>👏 Appreciation</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="categoryId">Category <span class="form-required" aria-label="required">*</span></label>
+            <select id="categoryId" name="categoryId" class="form-select" required aria-required="true">
+              <option value="">— Select category —</option>
+              <% categories.forEach(function(cat) { %>
+                <option value="<%= cat.id %>" <%= (formData.categoryId == cat.id) ? 'selected' : '' %>><%= cat.name %></option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="form-group">
+          <label class="form-label" for="priority">Priority <span class="form-required" aria-label="required">*</span></label>
+          <div class="priority-group" role="radiogroup" aria-labelledby="priorityLabel">
+            <span id="priorityLabel" class="sr-only">Select priority level</span>
+            <label class="priority-option priority-option--low">
+              <input type="radio" name="priority" value="low" <%= (formData.priority === 'low' || !formData.priority) ? '' : '' %> />
+              <span>🟢 Low</span>
+            </label>
+            <label class="priority-option priority-option--medium">
+              <input type="radio" name="priority" value="medium" <%= (formData.priority === 'medium' || !formData.priority) ? 'checked' : '' %> />
+              <span>🟡 Medium</span>
+            </label>
+            <label class="priority-option priority-option--high">
+              <input type="radio" name="priority" value="high" <%= (formData.priority === 'high') ? 'checked' : '' %> />
+              <span>🔴 High</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div class="form-group">
+          <label class="form-label" for="subject">Subject <span class="form-required" aria-label="required">*</span></label>
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            class="form-input"
+            value="<%= formData.subject || '' %>"
+            maxlength="255"
+            minlength="5"
+            placeholder="Brief summary of your feedback (5–255 characters)"
+            required
+            aria-required="true"
+            aria-describedby="subjectCount"
+          />
+          <span class="form-char-count" id="subjectCount" aria-live="polite"></span>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label" for="description">Description <span class="form-required" aria-label="required">*</span></label>
+          <textarea
+            id="description"
+            name="description"
+            class="form-textarea"
+            maxlength="5000"
+            minlength="10"
+            rows="6"
+            placeholder="Provide detailed information about your feedback (10–5000 characters)"
+            required
+            aria-required="true"
+            aria-describedby="descCount"
+          ><%= formData.description || '' %></textarea>
+          <span class="form-char-count" id="descCount" aria-live="polite"></span>
+        </div>
+
+        <!-- Anonymous submission -->
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox" name="isAnonymous" value="1" <%= (formData.isAnonymous) ? 'checked' : '' %> id="isAnonymous" aria-describedby="anonNote" />
+            <span>Submit anonymously</span>
+          </label>
+          <p class="form-hint" id="anonNote">
+            If checked, your name will not be displayed to administrators when reviewing this feedback.
+            Note: internal records are retained for system operation.
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <a href="/student/dashboard" class="btn btn--secondary">Cancel</a>
+          <button type="submit" class="btn btn--primary" id="feedbackSubmitBtn">Submit Feedback</button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

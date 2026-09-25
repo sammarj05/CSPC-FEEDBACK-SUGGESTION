@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'my-feedback' }) %>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">My Submissions</h1>
+      <p class="page-header__subtitle">Track the status of your feedback</p>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+
+    <% if (typeof flashSuccess !== 'undefined' && flashSuccess && flashSuccess.length > 0) { %>
+      <div class="flash flash--success" role="alert" aria-live="polite">
+        <span aria-hidden="true">✓</span> <%- flashSuccess[0] %>
+        <button class="flash__close" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+      </div>
+    <% } %>
+
+    <div class="list-actions">
+      <a href="/feedback/new" class="btn btn--primary" id="newFeedbackBtn">+ Submit New Feedback</a>
+    </div>
+
+    <% if (feedbackList.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-state__icon" aria-hidden="true">📭</div>
+        <h2 class="empty-state__title">No submissions yet</h2>
+        <p class="empty-state__text">You have not submitted any feedback.</p>
+        <a href="/feedback/new" class="btn btn--primary">Submit Your First Feedback</a>
+      </div>
+    <% } else { %>
+
+      <div class="table-wrapper" role="region" aria-label="Your feedback submissions" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Reference #</th>
+              <th scope="col">Subject</th>
+              <th scope="col">Category</th>
+              <th scope="col">Type</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Status</th>
+              <th scope="col">Submitted</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% feedbackList.forEach(function(fb) { %>
+              <tr>
+                <td><code class="ref-num"><%= fb.reference_number %></code></td>
+                <td class="td--subject"><%= fb.subject %></td>
+                <td><%= fb.category_name %></td>
+                <td><span class="type-chip"><%= fb.type.replace(/_/g,' ') %></span></td>
+                <td><%- include('../partials/priority-badge', { priority: fb.priority }) %></td>
+                <td><%- include('../partials/status-badge', { status: fb.status }) %></td>
+                <td>
+                  <time datetime="<%= fb.created_at %>">
+                    <%= new Date(fb.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }) %>
+                  </time>
+                </td>
+                <td><a href="/feedback/<%= fb.id %>" class="table-link" aria-label="View details for <%= fb.reference_number %>">View</a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+    <% } %>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

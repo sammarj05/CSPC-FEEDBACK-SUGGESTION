@@ -1,0 +1,11 @@
+<%# partials/errors.ejs — renders an inline validation error list %>
+<% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
+  <div class="form-errors" role="alert" aria-live="assertive">
+    <p class="form-errors__heading"><strong>Please correct the following:</strong></p>
+    <ul class="form-errors__list">
+      <% errors.forEach(function(err) { %>
+        <li><%= err %></li>
+      <% }); %>
+    </ul>
+  </div>
+<% } %>

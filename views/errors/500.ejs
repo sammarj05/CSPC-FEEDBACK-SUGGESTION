@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Something Went Wrong — CSPC Feedback System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  <main class="error-page" id="main-content">
+    <div class="error-page__inner">
+      <div class="error-page__code" aria-hidden="true">500</div>
+      <h1 class="error-page__title">Something Went Wrong</h1>
+      <p class="error-page__text">An unexpected error occurred. Please try again, or contact the system administrator if the problem persists.</p>
+      <% if (typeof detail !== 'undefined' && detail) { %>
+        <pre class="error-page__detail"><%= detail %></pre>
+      <% } %>
+      <a href="/" class="btn btn--primary">Go to Home</a>
+    </div>
+  </main>
+  <%- include('../partials/footer') %>
+</body>
+</html>
