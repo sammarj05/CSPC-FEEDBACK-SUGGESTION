@@ -60,7 +60,12 @@
             <% feedbackList.forEach(function(fb) { %>
               <tr>
                 <td><code class="ref-num"><%= fb.reference_number %></code></td>
-                <td class="td--subject"><%= fb.subject %></td>
+                <td class="td--subject">
+                  <%= fb.subject %>
+                  <% if (fb.is_anonymous) { %>
+                    <span class="badge badge--anon">Anonymous</span>
+                  <% } %>
+                </td>
                 <td><%= fb.category_name %></td>
                 <td><span class="type-chip"><%= fb.type.replace(/_/g,' ') %></span></td>
                 <td><%- include('../partials/priority-badge', { priority: fb.priority }) %></td>

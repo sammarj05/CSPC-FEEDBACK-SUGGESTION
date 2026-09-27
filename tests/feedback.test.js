@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterAll } from "vitest";
 const request = require("supertest");
 const app = require("../app");
 
@@ -90,11 +90,13 @@ describe("Home page", () => {
   });
 });
 
-describe("Anonymous feedback submission flow & model checks", { timeout: 30000 }, () => {
+describe("Anonymous feedback ownership and privacy", { timeout: 30000 }, () => {
   const feedbackModel = require("../models/feedbackModel");
-  const feedbackCtrl = require("../controllers/feedbackController");
+  const feedbackCtrl  = require("../controllers/feedbackController");
+  const adminCtrl     = require("../controllers/adminController");
 
-  it("saves anonymous feedback in database with user_id=null and is_anonymous=1", async () => {
+  // 1. Anonymous feedback is successfully created.
+  it("1. successfully creates anonymous feedback with unique reference number and is_anonymous=1", async () => {
     const { insertId, referenceNumber } = await feedbackModel.create({
       userId: 2,
       categoryId: 1,
@@ -107,20 +109,226 @@ describe("Anonymous feedback submission flow & model checks", { timeout: 30000 }
 
     expect(insertId).toBeGreaterThan(0);
     expect(referenceNumber).toMatch(/^FB-\d{4}-\d{5}$/);
+  });
 
-    // Verify row directly in database via findByIdAdmin
-    const record = await feedbackModel.findByIdAdmin(insertId);
-    expect(record).not.toBeNull();
-    expect(record.user_id).toBeNull();
-    expect(record.is_anonymous).toBe(1);
-    expect(record.student_name).toBeNull();
-    expect(record.student_email).toBeNull();
-    expect(record.student_id_no).toBeNull();
-    expect(record.reference_number).toBe(referenceNumber);
-    expect(record.status).toBe("submitted");
-  }, 30000);
+  // 2. Anonymous feedback appears to the submitting student.
+  it("2. anonymous feedback appears to the submitting student in list, detail, and stats", async () => {
+    const { insertId, referenceNumber } = await feedbackModel.create({
+      userId: 2,
+      categoryId: 1,
+      type: "suggestion",
+      priority: "low",
+      subject: "Anonymous student suggestion for study pods",
+      description: "Quiet study pods in the library would greatly help students.",
+      isAnonymous: true,
+    });
 
-  it("controller redirects anonymous submissions to /student/dashboard with reference number flash", async () => {
+    // Student findByUserId includes anonymous feedback
+    const userFeedback = await feedbackModel.findByUserId(2);
+    const found = userFeedback.find((f) => f.id === insertId);
+    expect(found).toBeDefined();
+    expect(found.reference_number).toBe(referenceNumber);
+    expect(found.is_anonymous).toBe(1);
+
+    // Student findByIdAndUser retrieves own anonymous feedback
+    const detail = await feedbackModel.findByIdAndUser(insertId, 2);
+    expect(detail).not.toBeNull();
+    expect(detail.reference_number).toBe(referenceNumber);
+    expect(detail.subject).toBe("Anonymous student suggestion for study pods");
+    expect(detail.is_anonymous).toBe(1);
+
+    // Student stats includes anonymous submission
+    const stats = await feedbackModel.studentStats(2);
+    expect(stats.total).toBeGreaterThanOrEqual(1);
+
+    // Controller detail view renders for the owner student
+    let renderedView = null;
+    let renderedData = null;
+    const mockReq = {
+      params: { id: String(insertId) },
+      session: { user: { id: 2, name: "Sam Canonce", role: "student" } },
+    };
+    const mockRes = {
+      status: (code) => {
+        mockRes.statusCode = code;
+        return mockRes;
+      },
+      render: (view, data) => {
+        renderedView = view;
+        renderedData = data;
+      },
+    };
+    await feedbackCtrl.feedbackDetail(mockReq, mockRes, (err) => { if (err) throw err; });
+    expect(renderedView).toBe("student/feedback-detail");
+    expect(renderedData.feedback.reference_number).toBe(referenceNumber);
+    expect(renderedData.feedback.is_anonymous).toBe(1);
+  });
+
+  // 3. Anonymous feedback remains hidden from other students.
+  it("3. anonymous feedback remains hidden from other students", async () => {
+    const { insertId } = await feedbackModel.create({
+      userId: 2,
+      categoryId: 1,
+      type: "concern",
+      priority: "medium",
+      subject: "Anonymous concern about cafeteria hygiene",
+      description: "Sanitizing stations in the cafeteria need regular refilling.",
+      isAnonymous: true,
+    });
+
+    // Other student (userId: 3) should not see it in findByUserId
+    const otherStudentList = await feedbackModel.findByUserId(3);
+    const foundInOther = otherStudentList.find((f) => f.id === insertId);
+    expect(foundInOther).toBeUndefined();
+
+    // Other student should not access it via findByIdAndUser
+    const otherStudentDetail = await feedbackModel.findByIdAndUser(insertId, 3);
+    expect(otherStudentDetail).toBeNull();
+
+    // Controller detail returns 404 for other student
+    let statusCode = 200;
+    let renderedView = null;
+    const mockReq = {
+      params: { id: String(insertId) },
+      session: { user: { id: 3, name: "KRIZA ALTHEA LLAGAS", role: "student" } },
+    };
+    const mockRes = {
+      status: (code) => {
+        statusCode = code;
+        return mockRes;
+      },
+      render: (view) => {
+        renderedView = view;
+      },
+    };
+    await feedbackCtrl.feedbackDetail(mockReq, mockRes, (err) => { if (err) throw err; });
+    expect(statusCode).toBe(404);
+    expect(renderedView).toBe("errors/404");
+  });
+
+  // 4. Anonymous feedback does not expose the student's identity to admins.
+  it("4. anonymous feedback does not expose student identity to admins in detail, reference, or list", async () => {
+    const { insertId, referenceNumber } = await feedbackModel.create({
+      userId: 2,
+      categoryId: 1,
+      type: "complaint",
+      priority: "high",
+      subject: "Anonymous complaint regarding laboratory equipment",
+      description: "Oscilloscope in Lab 3 is malfunctioning and poses safety risk.",
+      isAnonymous: true,
+    });
+
+    // findByIdAdmin masks user_id and student details
+    const recordById = await feedbackModel.findByIdAdmin(insertId);
+    expect(recordById).not.toBeNull();
+    expect(recordById.user_id).toBeNull();
+    expect(recordById.student_name).toBeNull();
+    expect(recordById.student_email).toBeNull();
+    expect(recordById.student_id_no).toBeNull();
+    expect(recordById.is_anonymous).toBe(1);
+
+    // findByReference masks user_id and student details
+    const recordByRef = await feedbackModel.findByReference(referenceNumber);
+    expect(recordByRef).not.toBeNull();
+    expect(recordByRef.user_id).toBeNull();
+    expect(recordByRef.student_name).toBeNull();
+    expect(recordByRef.student_email).toBeNull();
+    expect(recordByRef.student_id_no).toBeNull();
+    expect(recordByRef.is_anonymous).toBe(1);
+
+    // adminList masks student_name
+    const { rows } = await feedbackModel.adminList({ search: referenceNumber });
+    expect(rows.length).toBe(1);
+    expect(rows[0].student_name).toBeNull();
+    expect(rows[0].is_anonymous).toBe(1);
+
+    // Admin controller feedbackDetail does not expose student identity
+    let adminRenderedData = null;
+    const mockReq = {
+      params: { id: String(insertId) },
+      session: { user: { id: 1, name: "System Administrator", role: "admin" } },
+    };
+    const mockRes = {
+      status: () => mockRes,
+      render: (view, data) => {
+        adminRenderedData = data;
+      },
+    };
+    await adminCtrl.feedbackDetail(mockReq, mockRes, (err) => { if (err) throw err; });
+    expect(adminRenderedData.feedback.student_name).toBeNull();
+    expect(adminRenderedData.feedback.user_id).toBeNull();
+    expect(adminRenderedData.feedback.is_anonymous).toBe(1);
+  });
+
+  // 5. Normal feedback still appears to its owner.
+  it("5. normal (non-anonymous) feedback appears to its owner and exposes student info to admin", async () => {
+    const { insertId } = await feedbackModel.create({
+      userId: 2,
+      categoryId: 1,
+      type: "suggestion",
+      priority: "medium",
+      subject: "Non-anonymous student suggestion for sports equipment",
+      description: "More basketballs and volleyballs needed in the gymnasium.",
+      isAnonymous: false,
+    });
+
+    // Owner student sees it
+    const userFeedback = await feedbackModel.findByUserId(2);
+    const found = userFeedback.find((f) => f.id === insertId);
+    expect(found).toBeDefined();
+    expect(found.is_anonymous).toBe(0);
+
+    const detail = await feedbackModel.findByIdAndUser(insertId, 2);
+    expect(detail).not.toBeNull();
+    expect(detail.is_anonymous).toBe(0);
+
+    // Admin sees student identity for non-anonymous submission
+    const adminRecord = await feedbackModel.findByIdAdmin(insertId);
+    expect(adminRecord).not.toBeNull();
+    expect(adminRecord.user_id).toBe(2);
+    expect(adminRecord.student_name).toBe("Sam Canonce");
+    expect(adminRecord.is_anonymous).toBe(0);
+  });
+
+  // 6. Unauthorized users cannot access another student's feedback by changing the feedback ID.
+  it("6. unauthorized users cannot access another student's feedback by changing the feedback ID", async () => {
+    const { insertId } = await feedbackModel.create({
+      userId: 2,
+      categoryId: 1,
+      type: "suggestion",
+      priority: "low",
+      subject: "IDOR test suggestion",
+      description: "Testing that student 3 cannot view student 2 feedback.",
+      isAnonymous: false,
+    });
+
+    // Model level: findByIdAndUser for student 3 returns null
+    const result = await feedbackModel.findByIdAndUser(insertId, 3);
+    expect(result).toBeNull();
+
+    // Controller level: student 3 receives 404
+    let statusCode = 200;
+    let renderedView = null;
+    const mockReq = {
+      params: { id: String(insertId) },
+      session: { user: { id: 3, name: "KRIZA ALTHEA LLAGAS", role: "student" } },
+    };
+    const mockRes = {
+      status: (code) => {
+        statusCode = code;
+        return mockRes;
+      },
+      render: (view) => {
+        renderedView = view;
+      },
+    };
+    await feedbackCtrl.feedbackDetail(mockReq, mockRes, (err) => { if (err) throw err; });
+    expect(statusCode).toBe(404);
+    expect(renderedView).toBe("errors/404");
+  });
+
+  // 7. Existing anonymous submission behavior and redirect still work.
+  it("7. controller redirects anonymous submissions to /student/dashboard with reference number flash", async () => {
     let redirectedStatus = null;
     let redirectedUrl = null;
     let flashType = null;
@@ -163,7 +371,7 @@ describe("Anonymous feedback submission flow & model checks", { timeout: 30000 }
     expect(flashMsg).toMatch(/FB-\d{4}-\d{5}/);
   });
 
-  it("controller redirects non-anonymous submissions to /feedback/:id", async () => {
+  it("7b. controller redirects non-anonymous submissions to /feedback/:id", async () => {
     let redirectedStatus = null;
     let redirectedUrl = null;
 
@@ -172,7 +380,7 @@ describe("Anonymous feedback submission flow & model checks", { timeout: 30000 }
         type: "suggestion",
         categoryId: "1",
         priority: "low",
-        subject: "Non-anonymous test submission",
+        subject: "Non-anonymous test submission redirect",
         description: "Checking that regular non-anonymous feedback routes to detail page.",
         isAnonymous: undefined,
       },
@@ -199,7 +407,7 @@ describe("Anonymous feedback submission flow & model checks", { timeout: 30000 }
     expect(redirectedUrl).toMatch(/^\/feedback\/\d+$/);
   });
 
-  it("admin can view and update status of anonymous feedback", async () => {
+  it("7c. admin can view and update status of anonymous feedback", async () => {
     const { insertId } = await feedbackModel.create({
       userId: 2,
       categoryId: 1,
@@ -218,6 +426,11 @@ describe("Anonymous feedback submission flow & model checks", { timeout: 30000 }
     expect(record.status).toBe("under_review");
     expect(record.is_anonymous).toBe(1);
     expect(record.student_name).toBeNull();
+  });
+
+  afterAll(async () => {
+    const db = require("../config/database");
+    await db.end();
   });
 });
 

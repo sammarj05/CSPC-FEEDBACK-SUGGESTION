@@ -15,6 +15,7 @@
 require("dotenv").config();
 
 const app  = require("./app");
+const db   = require("./config/database");
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
@@ -22,13 +23,22 @@ const server = app.listen(PORT, () => {
   console.log(`[Server] Environment: ${process.env.NODE_ENV || "development"}`);
 });
 
-// Graceful shutdown support
-process.on("SIGTERM", () => {
-  console.log("[Server] SIGTERM received. Shutting down gracefully.");
-  server.close(() => {
+// Graceful shutdown support (closes HTTP server and MySQL pool)
+async function gracefulShutdown(signal) {
+  console.log(`[Server] ${signal} received. Shutting down gracefully.`);
+  server.close(async () => {
     console.log("[Server] HTTP server closed.");
+    try {
+      await db.end();
+      console.log("[Server] Database connection pool closed.");
+    } catch (err) {
+      console.error("[Server] Error closing database pool:", err.message);
+    }
     process.exit(0);
   });
-});
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT",  () => gracefulShutdown("SIGINT"));
 
 module.exports = server;

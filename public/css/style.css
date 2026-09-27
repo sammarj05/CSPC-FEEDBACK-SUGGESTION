@@ -2,6 +2,7 @@
    CSPC Suggestion & Feedback System
    style.css — Design System & Core Styles
    ============================================================= */
+@import "./chat.css";
 
 /* ------------------------------------------------------------------
    1. CSS Custom Properties (Design Tokens)

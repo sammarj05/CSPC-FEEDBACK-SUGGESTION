@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS feedback (
     id              INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     reference_number VARCHAR(20)     NOT NULL,
-    user_id         INT UNSIGNED    NULL COMMENT 'NULL if anonymous',
+    user_id         INT UNSIGNED    NULL COMMENT 'Author user id (identity masked from admins if is_anonymous = 1)',
     category_id     INT UNSIGNED    NOT NULL,
     type            ENUM(
         'suggestion',

@@ -123,8 +123,8 @@ async function login(req, res, next) {
     // Generic error — do not reveal whether the email exists
     const GENERIC_AUTH_ERROR = "Invalid email address or password.";
 
-    if (!user || !user.is_active) {
-      logger.warn("Login failed — user not found or inactive", { email: sanitize(email) });
+    if (!user || !user.is_active || !user.password_hash) {
+      logger.warn("Login failed — user not found, inactive, or oauth-only", { email: sanitize(email) });
       return res.status(401).render("auth/login", {
         title: "Log In — CSPC Feedback System",
         errors: [GENERIC_AUTH_ERROR],

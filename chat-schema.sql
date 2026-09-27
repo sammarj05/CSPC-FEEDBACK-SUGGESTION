@@ -9,7 +9,9 @@
 --   chat_messages       — one row per message
 -- =============================================================
 
-USE cspc_feedback_db_leftwayin;
+-- Select your active database (uncomment the appropriate line or select in your DB client):
+-- USE cspc_feedback_db;            -- for local XAMPP
+-- USE cspc_feedback_db_leftwayin;  -- for Filess production
 
 -- =============================================================
 -- CHAT CONVERSATIONS

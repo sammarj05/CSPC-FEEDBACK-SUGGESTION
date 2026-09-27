@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "CSPC Suggestion & Feedback System — Camarines Sur Polytechnic Colleges",
   "main": "server.js",
-
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
@@ -11,13 +10,20 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
-  "keywords": ["cspc", "feedback", "express", "ejs", "mysql"],
+  "keywords": [
+    "cspc",
+    "feedback",
+    "express",
+    "ejs",
+    "mysql"
+  ],
   "author": "",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcrypt": "^5.1.1",
     "connect-flash": "^0.1.1",
     "csrf-csrf": "^3.0.3",
