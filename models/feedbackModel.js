@@ -68,7 +68,7 @@ async function create({ userId, categoryId, type, priority, subject, description
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'submitted')`,
     [
       referenceNumber,
-      isAnonymous ? null : (userId || null),
+      userId || null,
       categoryId,
       type,
       priority,
@@ -134,23 +134,28 @@ async function findByIdAndUser(feedbackId, userId) {
 }
 
 // ---------------------------------------------------------------
-// READ — Admin (no ownership restriction)
+// READ — Admin (identity masked for anonymous feedback)
 // ---------------------------------------------------------------
 
 /**
  * Admin: find a feedback record by its reference number.
+ * Student identity is masked if submission is anonymous.
  *
  * @param {string} referenceNumber
  * @returns {Promise<object|null>}
  */
 async function findByReference(referenceNumber) {
   const [rows] = await db.query(
-    `SELECT f.*, c.name AS category_name,
-            u.name AS student_name, u.email AS student_email,
-            u.student_id AS student_id_no
+    `SELECT f.id, f.reference_number, f.category_id, f.type, f.priority,
+            f.subject, f.description, f.is_anonymous, f.status, f.created_at, f.updated_at,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE f.user_id END AS user_id,
+            c.name AS category_name,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.email END AS student_email,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.student_id END AS student_id_no
      FROM   feedback f
      JOIN   categories c ON c.id = f.category_id
-     LEFT   JOIN users u ON u.id = f.user_id
+     LEFT   JOIN users u ON (u.id = f.user_id AND f.is_anonymous = 0)
      WHERE  f.reference_number = ?
      LIMIT  1`,
     [referenceNumber]
@@ -160,18 +165,23 @@ async function findByReference(referenceNumber) {
 
 /**
  * Admin: find a feedback record by primary key.
+ * Student identity is masked if submission is anonymous.
  *
  * @param {number} id
  * @returns {Promise<object|null>}
  */
 async function findByIdAdmin(id) {
   const [rows] = await db.query(
-    `SELECT f.*, c.name AS category_name,
-            u.name AS student_name, u.email AS student_email,
-            u.student_id AS student_id_no
+    `SELECT f.id, f.reference_number, f.category_id, f.type, f.priority,
+            f.subject, f.description, f.is_anonymous, f.status, f.created_at, f.updated_at,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE f.user_id END AS user_id,
+            c.name AS category_name,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.email END AS student_email,
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.student_id END AS student_id_no
      FROM   feedback f
      JOIN   categories c ON c.id = f.category_id
-     LEFT   JOIN users u ON u.id = f.user_id
+     LEFT   JOIN users u ON (u.id = f.user_id AND f.is_anonymous = 0)
      WHERE  f.id = ?
      LIMIT  1`,
     [id]
@@ -181,6 +191,7 @@ async function findByIdAdmin(id) {
 
 /**
  * Admin: get all feedback with optional filters and pagination.
+ * Student name is masked if submission is anonymous.
  *
  * @param {{ status, categoryId, type, priority, search, page, perPage }} filters
  * @returns {Promise<{ rows: Array, total: number }>}
@@ -217,7 +228,7 @@ async function adminList({ status, categoryId, type, priority, search, page = 1,
     `SELECT COUNT(*) AS total
      FROM feedback f
      JOIN categories c ON c.id = f.category_id
-     LEFT JOIN users u ON u.id = f.user_id
+     LEFT JOIN users u ON (u.id = f.user_id AND f.is_anonymous = 0)
      ${whereClause}`,
     params
   );
@@ -228,10 +239,10 @@ async function adminList({ status, categoryId, type, priority, search, page = 1,
     `SELECT f.id, f.reference_number, f.subject, f.type, f.priority,
             f.status, f.is_anonymous, f.created_at, f.updated_at,
             c.name AS category_name,
-            u.name AS student_name
+            CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name
      FROM   feedback f
      JOIN   categories c ON c.id = f.category_id
-     LEFT   JOIN users u ON u.id = f.user_id
+     LEFT   JOIN users u ON (u.id = f.user_id AND f.is_anonymous = 0)
      ${whereClause}
      ORDER  BY f.created_at DESC
      LIMIT  ? OFFSET ?`,
