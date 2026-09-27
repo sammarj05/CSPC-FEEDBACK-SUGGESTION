@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 /**
  * controllers/chatController.js
@@ -27,18 +27,38 @@ const MAX_MESSAGE_LENGTH = 1000;
 // ---------------------------------------------------------------
 // Gemini client (lazy-init so app starts even without the key)
 // ---------------------------------------------------------------
-let geminiModel = null;
+const CANDIDATE_MODELS = [
+  process.env.GEMINI_MODEL,
+  "gemini-3.5-flash",
+  "gemini-3.8-flash",
+  "gemini-3.1-flash-lite",
+  "gemini-2.5-flash-lite",
+].filter(Boolean);
 
-function getGeminiModel() {
-  if (geminiModel) return geminiModel;
-  const apiKey = process.env.GEMINI_API_KEY;
+async function generateAiReply(history, systemInstruction, userMessage) {
+  const apiKey = (process.env.GEMINI_API_KEY || "").trim();
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not configured.");
   }
   const { GoogleGenerativeAI } = require("@google/generative-ai");
   const genAI = new GoogleGenerativeAI(apiKey);
-  geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  return geminiModel;
+
+  let lastError = null;
+  for (const modelName of CANDIDATE_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction,
+      });
+      const chat = model.startChat({ history });
+      const result = await chat.sendMessage(userMessage);
+      return result.response.text();
+    } catch (err) {
+      lastError = err;
+      logger.warn(`Model ${modelName} failed, trying next candidate`, { error: err.message });
+    }
+  }
+  throw lastError || new Error("All Gemini models failed.");
 }
 
 // ---------------------------------------------------------------
@@ -175,13 +195,11 @@ Use this information to answer the user's question accurately.`;
     // --- Call Gemini ---
     let aiReply;
     try {
-      const model = getGeminiModel();
-      const chat = model.startChat({
+      aiReply = await generateAiReply(
         history,
-        systemInstruction: SYSTEM_PROMPT + feedbackContext,
-      });
-      const result = await chat.sendMessage(userMessage);
-      aiReply = result.response.text();
+        SYSTEM_PROMPT + feedbackContext,
+        userMessage
+      );
     } catch (geminiErr) {
       logger.error("Gemini API error", { error: geminiErr.message });
       // Persist a fallback message
