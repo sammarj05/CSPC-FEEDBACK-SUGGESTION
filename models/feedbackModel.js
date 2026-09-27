@@ -56,11 +56,21 @@ async function generateReferenceNumber() {
 /**
  * Insert a new feedback record and record the initial status history.
  *
+ * IMPORTANT: user_id is ALWAYS stored as the real student ID, even for
+ * anonymous submissions. The is_anonymous flag controls visibility —
+ * admin queries mask the identity via CASE WHEN, but the student's own
+ * ownership queries (WHERE user_id = ?) still work correctly.
+ *
  * @param {{ userId, categoryId, type, priority, subject, description, isAnonymous }} data
  * @returns {Promise<{ insertId: number, referenceNumber: string }>}
  */
 async function create({ userId, categoryId, type, priority, subject, description, isAnonymous }) {
   const referenceNumber = await generateReferenceNumber();
+
+  // Always store the real userId — never null it out for anonymous submissions.
+  // is_anonymous = 1 tells admin queries to mask identity; student queries
+  // use WHERE user_id = ? which needs a real value to match.
+  const storedUserId = userId ? parseInt(userId, 10) : null;
 
   const [result] = await db.query(
     `INSERT INTO feedback
@@ -68,7 +78,7 @@ async function create({ userId, categoryId, type, priority, subject, description
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'submitted')`,
     [
       referenceNumber,
-      userId || null,
+      storedUserId,
       categoryId,
       type,
       priority,
