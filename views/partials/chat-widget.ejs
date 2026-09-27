@@ -1,0 +1,92 @@
+<%--
+  partials/chat-widget.ejs
+
+  Aizen AI — Floating chat widget.
+  Included in layouts/main.ejs just before </body>.
+
+  Security:
+    - No API key is present here.
+    - All AI communication goes through /api/chat (Express backend).
+    - The widget is visible to everyone (logged-in and guests).
+--%>
+
+<!-- Aizen AI Floating Button -->
+<button
+  class="chat-fab chat-fab--pulse"
+  id="chatFab"
+  aria-label="Open Aizen AI chat assistant"
+  aria-expanded="false"
+  aria-controls="chatPanel"
+>
+  <span class="chat-fab__icon" aria-hidden="true">🤖</span>
+  <span class="chat-fab__label">Aizen AI</span>
+</button>
+
+<!-- Aizen AI Chat Panel -->
+<div
+  class="chat-panel"
+  id="chatPanel"
+  role="dialog"
+  aria-label="Aizen AI Chat"
+  aria-modal="false"
+>
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header__avatar" aria-hidden="true">🤖</div>
+    <div class="chat-header__info">
+      <div class="chat-header__name">Aizen AI</div>
+      <div class="chat-header__subtitle">CSPC AI Assistant</div>
+      <div class="chat-header__status">
+        <span class="chat-header__status-dot" aria-hidden="true"></span>
+        <span>Online</span>
+      </div>
+    </div>
+    <button
+      class="chat-header__close"
+      id="chatClose"
+      aria-label="Close chat"
+      title="Close chat"
+    >✕</button>
+  </div>
+
+  <!-- Messages -->
+  <div
+    class="chat-messages"
+    id="chatMessages"
+    role="log"
+    aria-live="polite"
+    aria-label="Chat messages"
+  ></div>
+
+  <!-- Input area -->
+  <div class="chat-footer">
+    <div class="chat-input-row">
+      <textarea
+        class="chat-input"
+        id="chatInput"
+        placeholder="Type your message…"
+        rows="1"
+        maxlength="1000"
+        aria-label="Type a message to Aizen AI"
+        autocomplete="off"
+        spellcheck="true"
+      ></textarea>
+      <button
+        class="chat-send-btn"
+        id="chatSend"
+        aria-label="Send message"
+        title="Send"
+      >➤</button>
+    </div>
+
+    <div class="chat-escalate-row">
+      <button
+        class="chat-escalate-btn"
+        id="chatEscalate"
+        aria-label="Escalate conversation to a human administrator"
+      >👤 Talk to an Admin</button>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,165 @@
+<%- include('../layouts/main', {
+  title: title,
+  body: `
+<div class="container" style="padding: var(--space-8) var(--space-4);">
+
+  <!-- Page header -->
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-6);">
+    <div>
+      <h1 style="font-size:1.4rem; font-weight:700; color:var(--color-text); margin:0 0 0.25rem;">
+        💬 Conversation #${conv.id}
+      </h1>
+      <p style="color:var(--color-text-muted); font-size:0.875rem; margin:0;">
+        ${conv.user_name
+          ? `<strong>${conv.user_name}</strong> &lt;${conv.user_email}&gt;`
+          : 'Guest / Anonymous user'}
+        &nbsp;&middot;&nbsp;
+        <span class="chat-status-badge chat-status-badge--${conv.status}">${conv.status}</span>
+      </p>
+    </div>
+    <a href="/admin/chat" class="btn btn--outline" style="font-size:0.875rem;">← All Conversations</a>
+  </div>
+
+  <!-- Thread -->
+  <div class="admin-chat-thread" id="adminThread">
+    ${messages.length === 0
+      ? '<p style="text-align:center; color:var(--color-text-muted); font-size:0.875rem;">No messages yet.</p>'
+      : messages.map(m => \`
+          <div class="admin-thread-msg admin-thread-msg--\${m.sender_type}">
+            <div class="admin-thread-msg__sender">
+              \${m.sender_type === 'ai' ? 'Aizen AI' : m.sender_type === 'admin' ? 'Administrator' : 'User'}
+            </div>
+            <div class="admin-thread-msg__bubble">\${escapeHtml(m.message)}</div>
+            <div class="admin-thread-msg__time">
+              \${new Date(m.created_at).toLocaleString('en-PH', { dateStyle:'medium', timeStyle:'short' })}
+            </div>
+          </div>
+        \`).join('')
+    }
+  </div>
+
+  <!-- Admin reply form -->
+  <% if (conv.status !== 'closed') { %>
+  <div style="margin-top: var(--space-6);">
+    <h2 style="font-size:1rem; font-weight:600; margin:0 0 var(--space-3);">Reply as Administrator</h2>
+
+    <div style="display:flex; gap:0.75rem; align-items:flex-end;">
+      <textarea
+        id="adminReplyInput"
+        placeholder="Type your reply to the user…"
+        rows="3"
+        maxlength="1000"
+        style="flex:1; border:1.5px solid var(--color-border); border-radius:var(--radius); padding:0.6rem 0.75rem;
+               font-family:var(--font-sans); font-size:0.875rem; resize:vertical; color:var(--color-text);
+               background:var(--color-bg); transition:border-color 150ms ease;"
+        onfocus="this.style.borderColor='var(--color-primary)'; this.style.background='#fff';"
+        onblur="this.style.borderColor='var(--color-border)'; this.style.background='var(--color-bg)';"
+      ></textarea>
+      <button
+        id="adminSendBtn"
+        class="btn btn--primary"
+        style="height:2.6rem; white-space:nowrap;"
+        onclick="adminReply()"
+      >Send Reply</button>
+    </div>
+
+    <div style="margin-top:var(--space-3); display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <button
+        class="btn btn--outline"
+        style="font-size:0.8rem;"
+        onclick="closeConversation()"
+        id="closeConvBtn"
+      >Mark as Closed</button>
+      <span style="font-size:0.75rem; color:var(--color-text-muted); align-self:center;">
+        Replies are labeled <strong>Administrator</strong> and are clearly separate from Aizen AI messages.
+      </span>
+    </div>
+  </div>
+  <% } else { %>
+  <div style="margin-top:var(--space-4); padding:var(--space-3) var(--space-4); background:var(--color-bg-alt);
+              border-radius:var(--radius); color:var(--color-text-muted); font-size:0.875rem; text-align:center;">
+    This conversation is <strong>closed</strong>. No further replies can be sent.
+  </div>
+  <% } %>
+
+</div>
+
+<script>
+const CONV_ID = ${conv.id};
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function adminReply() {
+  const input  = document.getElementById('adminReplyInput');
+  const btn    = document.getElementById('adminSendBtn');
+  const thread = document.getElementById('adminThread');
+  const msg    = input.value.trim();
+  if (!msg) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('/admin/chat/' + CONV_ID + '/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg }),
+    });
+
+    if (res.ok) {
+      input.value = '';
+      // Append message to thread
+      const div = document.createElement('div');
+      div.className = 'admin-thread-msg admin-thread-msg--admin';
+      div.innerHTML =
+        '<div class="admin-thread-msg__sender">Administrator</div>' +
+        '<div class="admin-thread-msg__bubble">' + escapeHtml(msg) + '</div>' +
+        '<div class="admin-thread-msg__time">Just now</div>';
+      thread.appendChild(div);
+      thread.scrollTop = thread.scrollHeight;
+    } else {
+      alert('Could not send reply. Please try again.');
+    }
+  } catch (_e) {
+    alert('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Reply';
+  }
+}
+
+async function closeConversation() {
+  if (!confirm('Mark this conversation as closed?')) return;
+  const btn = document.getElementById('closeConvBtn');
+  btn.disabled = true;
+  btn.textContent = 'Closing…';
+
+  try {
+    const res = await fetch('/admin/chat/' + CONV_ID + '/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: '__CLOSE__' }),
+    });
+    if (res.ok) {
+      location.reload();
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Mark as Closed';
+    }
+  } catch (_e) {
+    btn.disabled = false;
+    btn.textContent = 'Mark as Closed';
+  }
+}
+
+// Scroll thread to bottom on load
+(function() {
+  const t = document.getElementById('adminThread');
+  if (t) t.scrollTop = t.scrollHeight;
+})();
+</script>
+`
+}) %>

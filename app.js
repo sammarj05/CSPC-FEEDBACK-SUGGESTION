@@ -33,6 +33,7 @@ const passport       = require("./config/passport");
 const authRoutes     = require("./routes/authRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const adminRoutes    = require("./routes/adminRoutes");
+const chatRoutes     = require("./routes/chatRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -152,6 +153,7 @@ app.get("/privacy-policy", (req, res) => {
 app.use("/auth",   authRoutes);
 app.use("/",       feedbackRoutes);   // /student/dashboard, /feedback/*
 app.use("/admin",  adminRoutes);
+app.use("/",       chatRoutes);       // /api/chat, /admin/chat
 
 // ---------------------------------------------------------------
 // 10. 404 handler — MUST be after all routes
