@@ -3,8 +3,7 @@
 -- Seed Data
 -- =============================================================
 
-USE cspc_feedback_db;
-
+USE cspc_feedback_db_leftwayin;
 -- =============================================================
 -- CATEGORIES SEED
 -- =============================================================
@@ -28,7 +27,7 @@ INSERT IGNORE INTO users (name, email, password_hash, role, department) VALUES
   (
     'System Administrator',
     'admin@cspc.edu.ph',
-    '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TgxR.xQ1HAlQ6Q0BaBQEBi5nVYYe',
+    '$2b$12$Gv8tuCf66aaqg57GqvXZx.Mv8MrCo7asq0cqgrDIslEKuSuWUOVEK',
     'admin',
     'CSPC ICT Office'
   );

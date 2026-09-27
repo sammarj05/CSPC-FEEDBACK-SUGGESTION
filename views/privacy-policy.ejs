@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Privacy Policy for the CSPC Suggestion and Feedback System — how we collect, use, and protect your information." />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+  <style>
+    /* ── Privacy Policy page styles ────────────────────────────── */
+    .privacy-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #1a56db 100%);
+      padding-block: var(--space-12) var(--space-10);
+      text-align: center;
+    }
+    .privacy-hero__eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: var(--space-3);
+    }
+    .privacy-hero__title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: var(--space-3);
+    }
+    .privacy-hero__meta {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* Content wrapper */
+    .privacy-body {
+      max-width: 820px;
+      margin-inline: auto;
+      padding: var(--space-12) var(--space-6);
+    }
+
+    /* Academic notice banner */
+    .notice-banner {
+      background: var(--color-primary-light);
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-10);
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-start;
+    }
+    .notice-banner__icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    .notice-banner__text {
+      font-size: 0.9rem;
+      color: var(--color-primary-dark);
+      line-height: 1.6;
+    }
+    .notice-banner__text strong { font-weight: 600; }
+
+    /* Table of contents */
+    .toc {
+      background: var(--color-bg-alt);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-10);
+    }
+    .toc__title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+    }
+    .toc__list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      list-style: decimal;
+      padding-left: var(--space-6);
+      margin: 0;
+    }
+    .toc__list a {
+      font-size: 0.875rem;
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .toc__list a:hover { color: var(--color-primary-dark); text-decoration: underline; }
+
+    /* Policy sections */
+    .policy-section {
+      margin-bottom: var(--space-10);
+    }
+    .policy-section__anchor {
+      display: block;
+      position: relative;
+      top: -80px;
+      visibility: hidden;
+    }
+    .policy-section__heading {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 2px solid var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .policy-section__heading-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .policy-section p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.75;
+      margin-bottom: var(--space-4);
+    }
+    .policy-section p:last-child { margin-bottom: 0; }
+    .policy-section ul,
+    .policy-section ol {
+      margin-bottom: var(--space-4);
+      padding-left: var(--space-6);
+    }
+    .policy-section ul { list-style: disc; }
+    .policy-section ol { list-style: decimal; }
+    .policy-section li {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.75;
+      margin-bottom: var(--space-1);
+    }
+    .policy-section strong { color: var(--color-text); font-weight: 600; }
+    .policy-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      margin-top: var(--space-4);
+      color: var(--color-text);
+    }
+
+    /* Comparison table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: var(--space-4);
+      font-size: 0.875rem;
+    }
+    .data-table th {
+      background: var(--color-bg-alt);
+      color: var(--color-text);
+      font-weight: 600;
+      padding: var(--space-3) var(--space-4);
+      text-align: left;
+      border: 1px solid var(--color-border);
+    }
+    .data-table td {
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--color-border);
+      vertical-align: top;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+    .data-table tr:nth-child(even) td { background: var(--color-bg-alt); }
+
+    /* Inline tags */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag--yes  { background: #d1fae5; color: #065f46; }
+    .tag--no   { background: #fee2e2; color: #991b1b; }
+
+    /* Contact card */
+    .contact-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      display: flex;
+      gap: var(--space-5);
+      align-items: flex-start;
+    }
+    .contact-card__icon { font-size: 2rem; flex-shrink: 0; line-height: 1; }
+    .contact-card__content p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+    }
+    .contact-card__content p:last-child { margin-bottom: 0; }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-8);
+      transition: color var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--color-primary); }
+
+    /* Responsive overrides */
+    @media (max-width: 640px) {
+      .privacy-body { padding: var(--space-8) var(--space-4); }
+      .contact-card { flex-direction: column; }
+      .data-table, .data-table tbody, .data-table tr { display: block; }
+      .data-table thead { display: none; }
+      .data-table td {
+        display: block;
+        border-bottom: none;
+        padding: var(--space-2) var(--space-3);
+      }
+      .data-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--color-text);
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 2px;
+      }
+      .data-table tr {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        margin-bottom: var(--space-3);
+        overflow: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <%- include('partials/navbar') %>
+
+  <!-- Hero banner -->
+  <section class="privacy-hero" aria-labelledby="privacyHeading">
+    <div class="container">
+      <span class="privacy-hero__eyebrow">CSPC Suggestion &amp; Feedback System</span>
+      <h1 class="privacy-hero__title" id="privacyHeading">Privacy Policy</h1>
+      <p class="privacy-hero__meta">Last updated: September 2026 &nbsp;&middot;&nbsp; Academic / Project System</p>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <div class="privacy-body">
+
+    <a href="/" class="back-link" id="privacyBackLink">&#8592; Back to Home</a>
+
+    <!-- Academic notice -->
+    <div class="notice-banner" role="note" aria-label="Academic project notice">
+      <span class="notice-banner__icon" aria-hidden="true">🎓</span>
+      <div class="notice-banner__text">
+        <strong>Academic / Project System.</strong> This system was developed as an academic project for
+        Camarines Sur Polytechnic Colleges (CSPC). It is not a commercial service. This policy describes
+        the data the system actually collects and how it is used to operate the feedback platform.
+        If you have questions, please use the contact information at the bottom of this page.
+      </div>
+    </div>
+
+    <!-- Table of contents -->
+    <nav class="toc" aria-label="Privacy policy sections">
+      <p class="toc__title">Contents</p>
+      <ol class="toc__list">
+        <li><a href="#section-overview">Overview</a></li>
+        <li><a href="#section-who">Who This Policy Applies To</a></li>
+        <li><a href="#section-account-data">Account &amp; Authentication Data</a></li>
+        <li><a href="#section-feedback-data">Feedback &amp; Submission Data</a></li>
+        <li><a href="#section-anonymous">Anonymous vs. Identified Feedback</a></li>
+        <li><a href="#section-session">Session &amp; Technical Data</a></li>
+        <li><a href="#section-use">How We Use Your Information</a></li>
+        <li><a href="#section-access">Who Can Access Your Data</a></li>
+        <li><a href="#section-storage">Database Storage</a></li>
+        <li><a href="#section-email">Email Communication</a></li>
+        <li><a href="#section-retention">Data Retention</a></li>
+        <li><a href="#section-security">Security Measures</a></li>
+        <li><a href="#section-contact">Contact &amp; Questions</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. Overview -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-overview" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">1</span>
+        Overview
+      </h2>
+      <p>
+        The <strong>CSPC Suggestion &amp; Feedback System</strong> is a web application that allows
+        students and members of the Camarines Sur Polytechnic Colleges community to submit feedback,
+        suggestions, complaints, concerns, and appreciation to authorized college administrators.
+      </p>
+      <p>
+        This Privacy Policy explains what personal information the system collects, how it is used
+        to operate the feedback platform, and who can access it. We only collect information that is
+        necessary to run the system. We do not sell or share your data with third parties outside of
+        what is described below.
+      </p>
+    </section>
+
+    <!-- 2. Who -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-who" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">2</span>
+        Who This Policy Applies To
+      </h2>
+      <p>
+        This policy applies to all users of the CSPC Suggestion &amp; Feedback System, including:
+      </p>
+      <ul>
+        <li><strong>Registered students</strong> &mdash; users who create an account (via Google OAuth or email/password) and submit feedback.</li>
+        <li><strong>Anonymous submissions</strong> &mdash; authenticated users who choose to submit a specific feedback item marked as anonymous.</li>
+        <li><strong>Administrators</strong> &mdash; authorized CSPC personnel who review and respond to submitted feedback.</li>
+        <li><strong>Visitors</strong> &mdash; anyone who browses public pages (such as this page) without logging in.</li>
+      </ul>
+    </section>
+
+    <!-- 3. Account data -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-account-data" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">3</span>
+        Account &amp; Authentication Data
+      </h2>
+      <p>The system supports two ways to create an account:</p>
+
+      <h3>a) Google OAuth (&ldquo;Sign in with Google&rdquo;)</h3>
+      <p>
+        When you sign in using Google, the system receives the following information directly from
+        Google&rsquo;s OAuth 2.0 service and stores it in the database:
+      </p>
+      <ul>
+        <li><strong>Full name</strong> &mdash; from your Google profile (<code>displayName</code>).</li>
+        <li><strong>Email address</strong> &mdash; the primary email associated with your Google account.</li>
+        <li><strong>Google account identifier (Google ID / <code>sub</code>)</strong> &mdash; a unique numeric
+            identifier that Google assigns to your account, stored to link your Google account to your
+            system account on future logins.</li>
+        <li><strong>Profile picture URL (avatar)</strong> &mdash; the URL of your Google profile photo,
+            if Google provides one. This URL is stored in the database. The current interface does not
+            display it in profile views; only the first letter of your name is shown as an avatar in
+            the navigation bar.</li>
+      </ul>
+      <p>
+        No Google access tokens or refresh tokens are stored by this system. Once you are authenticated,
+        only your internal user ID, name, and role are kept in the server-side session.
+      </p>
+
+      <h3>b) Email &amp; Password Registration</h3>
+      <p>
+        If you register manually with an email address and password, the system stores:
+      </p>
+      <ul>
+        <li><strong>Full name</strong> &mdash; as entered during registration.</li>
+        <li><strong>Email address</strong> &mdash; stored in lowercase.</li>
+        <li><strong>Password hash</strong> &mdash; your password is <em>never</em> stored in plain text.
+            It is stored as a one-way bcrypt hash; the original password cannot be recovered from it.</li>
+        <li><strong>Student ID</strong> (optional) &mdash; if provided during registration.</li>
+        <li><strong>Department</strong> (optional) &mdash; if provided during registration.</li>
+      </ul>
+      <p>Manual email/password accounts do not have a profile picture stored.</p>
+
+      <h3>c) Account status and role</h3>
+      <p>
+        All accounts have a <strong>role</strong> (<code>student</code> or <code>admin</code>) and an
+        <strong>active/inactive status</strong> managed in the database. Roles and active status are
+        set server-side and cannot be changed by users through the interface.
+      </p>
+    </section>
+
+    <!-- 4. Feedback data -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-feedback-data" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">4</span>
+        Feedback &amp; Submission Data
+      </h2>
+      <p>When you submit feedback, the system stores the following in the database:</p>
+      <table class="data-table" aria-label="Feedback data fields stored by the system">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Field"><strong>Reference number</strong></td>
+            <td data-label="Description">A unique tracking identifier in the format <code>FB-YYYY-#####</code>, generated automatically.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Category</strong></td>
+            <td data-label="Description">The category you selected (e.g., Academic, Facilities, Student Services).</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Type</strong></td>
+            <td data-label="Description">Suggestion, Complaint, Concern, General Feedback, or Appreciation.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Priority</strong></td>
+            <td data-label="Description">Low, Medium, or High &mdash; selected when submitting.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Subject</strong></td>
+            <td data-label="Description">The title/subject of your feedback item.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Description</strong></td>
+            <td data-label="Description">The full text of your feedback or suggestion.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Anonymous flag</strong></td>
+            <td data-label="Description">Whether you chose to submit anonymously (see Section 5).</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Status</strong></td>
+            <td data-label="Description">Current status: Submitted, Under Review, In Progress, Resolved, or Closed.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>User ID (submitter link)</strong></td>
+            <td data-label="Description">A database foreign key linking the feedback to your account. Stored as <code>NULL</code> when you submit anonymously.</td>
+          </tr>
+          <tr>
+            <td data-label="Field"><strong>Timestamps</strong></td>
+            <td data-label="Description">Date and time the feedback was created and last updated.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        A <strong>status history log</strong> is maintained for each feedback item, recording every
+        status change, the administrator who made it, and any note left by the administrator.
+      </p>
+      <p>
+        <strong>Administrator responses</strong> to your feedback are stored separately and are visible
+        to you on the feedback detail page when you are logged in.
+      </p>
+    </section>
+
+    <!-- 5. Anonymous vs identified -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-anonymous" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">5</span>
+        Anonymous vs. Identified Feedback
+      </h2>
+      <p>
+        You must be logged in to submit feedback. However, the submission form provides a
+        <strong>&ldquo;Submit anonymously&rdquo;</strong> checkbox. Here is exactly how each mode works:
+      </p>
+      <table class="data-table" aria-label="Comparison of anonymous and identified feedback">
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Identified Feedback</th>
+            <th>Anonymous Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Aspect"><strong>Login required?</strong></td>
+            <td data-label="Identified Feedback"><span class="tag tag--yes">Yes</span></td>
+            <td data-label="Anonymous Feedback"><span class="tag tag--yes">Yes</span></td>
+          </tr>
+          <tr>
+            <td data-label="Aspect"><strong>User ID stored with feedback?</strong></td>
+            <td data-label="Identified Feedback"><span class="tag tag--yes">Yes</span></td>
+            <td data-label="Anonymous Feedback"><span class="tag tag--no">No &mdash; stored as NULL</span></td>
+          </tr>
+          <tr>
+            <td data-label="Aspect"><strong>Admins can see your name?</strong></td>
+            <td data-label="Identified Feedback"><span class="tag tag--yes">Yes</span></td>
+            <td data-label="Anonymous Feedback"><span class="tag tag--no">No</span></td>
+          </tr>
+          <tr>
+            <td data-label="Aspect"><strong>Visible on your own dashboard?</strong></td>
+            <td data-label="Identified Feedback"><span class="tag tag--yes">Yes</span></td>
+            <td data-label="Anonymous Feedback"><span class="tag tag--no">No &mdash; not linked to your account</span></td>
+          </tr>
+          <tr>
+            <td data-label="Aspect"><strong>Feedback content stored?</strong></td>
+            <td data-label="Identified Feedback"><span class="tag tag--yes">Yes</span></td>
+            <td data-label="Anonymous Feedback"><span class="tag tag--yes">Yes &mdash; subject, description, category, etc.</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <strong>Important:</strong> Even when submitting anonymously, the feedback content itself
+        (subject, description, category, type) is still stored in the database. Only the link between
+        your account and that specific feedback record is removed. The system does not log your IP
+        address alongside feedback submissions.
+      </p>
+    </section>
+
+    <!-- 6. Session -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-session" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">6</span>
+        Session &amp; Technical Data
+      </h2>
+      <p>
+        When you log in, the server creates a <strong>session</strong> that stores a minimal amount
+        of information to keep you authenticated across page requests:
+      </p>
+      <ul>
+        <li>Your internal <strong>user ID</strong> (a database integer).</li>
+        <li>Your <strong>display name</strong>.</li>
+        <li>Your <strong>role</strong> (<code>student</code> or <code>admin</code>).</li>
+      </ul>
+      <p>
+        Sessions are stored server-side and expire automatically after <strong>2 hours</strong> of
+        inactivity. A session cookie is placed in your browser to identify your session. This cookie is:
+      </p>
+      <ul>
+        <li>Marked <code>HttpOnly</code> &mdash; it cannot be read by client-side JavaScript.</li>
+        <li>Marked <code>SameSite=Lax</code> &mdash; it is not sent on cross-site requests.</li>
+        <li>Marked <code>Secure</code> in production &mdash; it is only transmitted over HTTPS.</li>
+      </ul>
+      <p>
+        The system uses <strong>Morgan</strong> for HTTP request logging. These server logs record
+        the HTTP method, URL, status code, and response time for debugging purposes. They do not
+        include the content of your submissions.
+      </p>
+    </section>
+
+    <!-- 7. How we use -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-use" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">7</span>
+        How We Use Your Information
+      </h2>
+      <p>
+        Your information is used exclusively to operate the CSPC Suggestion &amp; Feedback System:
+      </p>
+      <ul>
+        <li><strong>Account management</strong> &mdash; to create, authenticate, and manage your account.</li>
+        <li><strong>Feedback processing</strong> &mdash; to receive, categorize, track, and respond to your submissions.</li>
+        <li><strong>Dashboard personalization</strong> &mdash; to display your own feedback and its current status on your personal dashboard (identified submissions only).</li>
+        <li><strong>Administrator review</strong> &mdash; to allow authorized CSPC personnel to read, prioritize, update, and respond to feedback.</li>
+        <li><strong>System security</strong> &mdash; to enforce rate limits, prevent abuse, and protect authenticated routes.</li>
+        <li><strong>Aggregate statistics</strong> &mdash; the admin dashboard displays summary counts by status, category, and type. These statistics do not identify individual users.</li>
+      </ul>
+      <p>
+        We do not use your information for advertising, third-party analytics, or any purpose other
+        than operating this feedback system.
+      </p>
+    </section>
+
+    <!-- 8. Who can access -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-access" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">8</span>
+        Who Can Access Your Data
+      </h2>
+      <ul>
+        <li>
+          <strong>You</strong> &mdash; you can view all of your own identified feedback submissions
+          along with their full status history and admin responses on your personal dashboard.
+        </li>
+        <li>
+          <strong>Authorized administrators</strong> &mdash; users with the <code>admin</code> role
+          have access to all submitted feedback, including the submitter&rsquo;s name, email, and
+          student ID for identified submissions. Administrators can update feedback status, add notes,
+          and post responses. They cannot see who submitted anonymous feedback.
+        </li>
+        <li>
+          <strong>Other students</strong> &mdash; cannot access other students&rsquo; feedback. Every
+          student query is scoped to their own user ID at the database query level.
+        </li>
+        <li>
+          <strong>Third parties</strong> &mdash; no personal data is shared with any third party,
+          with the exception of Google&rsquo;s OAuth service during login (see Section 3a). No
+          analytics or advertising services are integrated.
+        </li>
+      </ul>
+    </section>
+
+    <!-- 9. Database storage -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-storage" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">9</span>
+        Database Storage
+      </h2>
+      <p>
+        All data is stored in a <strong>MySQL</strong> relational database. The database contains
+        the following tables that hold personal or submission data:
+      </p>
+      <ul>
+        <li><strong>users</strong> &mdash; stores account information (name, email, password hash, Google ID, avatar URL, role, student ID, department).</li>
+        <li><strong>feedback</strong> &mdash; stores all feedback submissions.</li>
+        <li><strong>feedback_status_history</strong> &mdash; stores every status change for each feedback item.</li>
+        <li><strong>feedback_responses</strong> &mdash; stores administrator responses to feedback items.</li>
+        <li><strong>categories</strong> &mdash; stores the available feedback categories (no personal data).</li>
+      </ul>
+      <p>
+        All database queries use <strong>parameterized statements</strong> to prevent SQL injection.
+        Passwords are stored as bcrypt hashes; no plain-text password is retained anywhere in the system.
+      </p>
+    </section>
+
+    <!-- 10. Email -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-email" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">10</span>
+        Email Communication
+      </h2>
+      <p>
+        The current implementation of this system <strong>does not send any email notifications</strong>.
+        Administrator responses are posted directly to the feedback detail page and are visible when
+        you log in and view that submission. No automated emails are sent to users at any point.
+      </p>
+    </section>
+
+    <!-- 11. Retention -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-retention" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">11</span>
+        Data Retention
+      </h2>
+      <p>
+        The current system does not implement an automated data deletion or account deactivation
+        workflow accessible to students. Specifically:
+      </p>
+      <ul>
+        <li>
+          <strong>Accounts</strong> can be marked inactive by a database administrator. An inactive
+          account cannot log in. There is no self-service account deletion feature in the current interface.
+        </li>
+        <li>
+          <strong>Feedback submissions</strong> remain in the database until manually removed by a
+          database administrator. The application interface does not currently provide a
+          &ldquo;delete feedback&rdquo; feature for students or admins.
+        </li>
+        <li>
+          <strong>If a user account is deleted</strong> from the database directly, the schema sets
+          the <code>user_id</code> field on that user&rsquo;s feedback records to <code>NULL</code>
+          (via <code>ON DELETE SET NULL</code>), effectively de-linking the submissions from the
+          deleted account while retaining the feedback content.
+        </li>
+      </ul>
+      <p>
+        If you would like your account or submitted data reviewed or removed, please contact us using
+        the information in Section 13.
+      </p>
+    </section>
+
+    <!-- 12. Security -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-security" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">12</span>
+        Security Measures
+      </h2>
+      <p>
+        The following security measures are implemented in the current codebase:
+      </p>
+      <ul>
+        <li><strong>Helmet.js security headers</strong> &mdash; sets HTTP security headers including <code>Content-Security-Policy</code> and <code>X-Frame-Options</code> on every response.</li>
+        <li><strong>HTTPS enforcement</strong> &mdash; session cookies are marked <code>Secure</code> in the production environment, ensuring they are only transmitted over HTTPS.</li>
+        <li><strong>HttpOnly cookies</strong> &mdash; session cookies cannot be read by browser JavaScript, mitigating XSS-related session theft.</li>
+        <li><strong>bcrypt password hashing</strong> &mdash; passwords for manual accounts are stored as bcrypt hashes; plain-text passwords are never persisted.</li>
+        <li><strong>Parameterized SQL queries</strong> &mdash; all database queries use parameterized statements; no string concatenation is used for SQL, preventing SQL injection.</li>
+        <li><strong>Rate limiting</strong> &mdash; the login, registration, and feedback submission endpoints have per-IP rate limits to deter brute-force and spam attacks.</li>
+        <li><strong>Ownership-scoped queries</strong> &mdash; student queries always include a <code>WHERE user_id = ?</code> condition enforced at the database level, preventing cross-account data access.</li>
+        <li><strong>Role-based access control</strong> &mdash; roles are stored in the database and checked server-side on every protected route; they cannot be escalated through the client.</li>
+      </ul>
+      <p>
+        As this is an academic project, it may not implement the full depth of security controls
+        found in commercial production systems. No system can guarantee absolute security.
+      </p>
+    </section>
+
+    <!-- 13. Contact -->
+    <section class="policy-section">
+      <span class="policy-section__anchor" id="section-contact" aria-hidden="true"></span>
+      <h2 class="policy-section__heading">
+        <span class="policy-section__heading-num" aria-hidden="true">13</span>
+        Contact &amp; Questions
+      </h2>
+      <p>
+        If you have questions about this Privacy Policy, want to request access to your data, or
+        would like to ask about account or data removal, please contact the system administrator:
+      </p>
+      <div class="contact-card" role="region" aria-label="Contact information">
+        <span class="contact-card__icon" aria-hidden="true">🏫</span>
+        <div class="contact-card__content">
+          <p><strong>Institution:</strong> Camarines Sur Polytechnic Colleges (CSPC)</p>
+          <p><strong>System:</strong> CSPC Suggestion &amp; Feedback System</p>
+          <p>
+            You may reach the system administrator by submitting an inquiry through the feedback
+            system itself after logging in, or by contacting the relevant CSPC office directly.
+          </p>
+          <p style="margin-top:var(--space-3); font-size:0.8rem; color:var(--color-text-light);">
+            This is an academic project system. It does not claim compliance with any specific data
+            protection law or regulation. If you have a concern about your data, we will do our best
+            to address it promptly.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.privacy-body -->
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

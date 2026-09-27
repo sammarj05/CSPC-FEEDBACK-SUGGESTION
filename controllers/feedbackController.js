@@ -126,6 +126,16 @@ async function submitFeedback(req, res, next) {
 
     // POST → Redirect → GET
     req.flash("success", `Feedback submitted successfully. Your reference number is <strong>${referenceNumber}</strong>.`);
+
+    // Anonymous feedback is stored with user_id = NULL in the database.
+    // The detail-page query enforces ownership via WHERE id = ? AND user_id = ?,
+    // which never matches a NULL row (SQL NULL equality is always NULL/false).
+    // Redirecting to the detail page would therefore always produce a 404.
+    // Instead, redirect anonymous submissions to the dashboard where the flash
+    // message (containing the reference number) is displayed.
+    if (anonymous) {
+      return res.redirect(303, "/student/dashboard");
+    }
     return res.redirect(303, `/feedback/${insertId}`);
   } catch (err) {
     return next(err);

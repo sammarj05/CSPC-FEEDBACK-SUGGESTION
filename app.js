@@ -142,6 +142,13 @@ app.get("/", (req, res) => {
   });
 });
 
+// Privacy Policy — public, no authentication required
+app.get("/privacy-policy", (req, res) => {
+  res.render("privacy-policy", {
+    title: "Privacy Policy — CSPC Suggestion & Feedback System",
+  });
+});
+
 app.use("/auth",   authRoutes);
 app.use("/",       feedbackRoutes);   // /student/dashboard, /feedback/*
 app.use("/admin",  adminRoutes);

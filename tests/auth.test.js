@@ -1,4 +1,4 @@
-const { describe, it, expect } = require("vitest");
+import { describe, it, expect } from "vitest";
 const request = require("supertest");
 const app = require("../app");
 
@@ -19,9 +19,9 @@ describe("GET /auth/login", () => {
     expect(res.text).toContain("/auth/google");
   });
 
-  it("contains CSPC Email login label", async () => {
+  it("contains Google OAuth login label", async () => {
     const res = await request(app).get("/auth/login");
-    expect(res.text).toContain("Login with CSPC Email");
+    expect(res.text).toContain("Sign in with Google");
   });
 });
 
@@ -32,9 +32,9 @@ describe("GET /auth/register", () => {
     expect(res.text).toContain("Create Your Account");
   });
 
-  it("contains CSPC Email OAuth button", async () => {
+  it("contains Google OAuth button", async () => {
     const res = await request(app).get("/auth/register");
-    expect(res.text).toContain("Continue with CSPC Email");
+    expect(res.text).toContain("Sign up with Google");
   });
 });
 

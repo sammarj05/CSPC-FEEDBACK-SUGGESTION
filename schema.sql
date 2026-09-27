@@ -3,11 +3,7 @@
 -- Database Schema
 -- =============================================================
 
-CREATE DATABASE IF NOT EXISTS cspc_feedback_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE cspc_feedback_db;
+USE cspc_feedback_db_leftwayin;
 
 -- =============================================================
 -- USERS TABLE
@@ -51,17 +47,30 @@ CREATE TABLE IF NOT EXISTS categories (
 -- =============================================================
 CREATE TABLE IF NOT EXISTS feedback (
     id              INT UNSIGNED    NOT NULL AUTO_INCREMENT,
-    reference_number VARCHAR(20)   NOT NULL,
+    reference_number VARCHAR(20)     NOT NULL,
     user_id         INT UNSIGNED    NULL COMMENT 'NULL if anonymous',
     category_id     INT UNSIGNED    NOT NULL,
-    type            ENUM('suggestion','complaint','concern','general_feedback','appreciation') NOT NULL,
+    type            ENUM(
+        'suggestion',
+        'complaint',
+        'concern',
+        'general_feedback',
+        'appreciation'
+    ) NOT NULL,
     priority        ENUM('low','medium','high') NOT NULL DEFAULT 'medium',
     subject         VARCHAR(255)    NOT NULL,
     description     TEXT            NOT NULL,
     is_anonymous    TINYINT(1)      NOT NULL DEFAULT 0,
-    status          ENUM('submitted','under_review','in_progress','resolved','closed') NOT NULL DEFAULT 'submitted',
+    status          ENUM(
+        'submitted',
+        'under_review',
+        'in_progress',
+        'resolved',
+        'closed'
+    ) NOT NULL DEFAULT 'submitted',
     created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
     UNIQUE KEY uq_feedback_reference (reference_number),
@@ -88,8 +97,20 @@ CREATE TABLE IF NOT EXISTS feedback_status_history (
     id          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
     feedback_id INT UNSIGNED    NOT NULL,
     changed_by  INT UNSIGNED    NULL COMMENT 'admin user id',
-    old_status  ENUM('submitted','under_review','in_progress','resolved','closed') NULL,
-    new_status  ENUM('submitted','under_review','in_progress','resolved','closed') NOT NULL,
+    old_status  ENUM(
+        'submitted',
+        'under_review',
+        'in_progress',
+        'resolved',
+        'closed'
+    ) NULL,
+    new_status  ENUM(
+        'submitted',
+        'under_review',
+        'in_progress',
+        'resolved',
+        'closed'
+    ) NOT NULL,
     note        TEXT            NULL,
     created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -116,7 +137,8 @@ CREATE TABLE IF NOT EXISTS feedback_responses (
     admin_id    INT UNSIGNED    NULL,
     message     TEXT            NOT NULL,
     created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP
+                ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
     KEY idx_responses_feedback (feedback_id),
