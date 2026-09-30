@@ -21,21 +21,7 @@ const feedbackModel  = require("../models/feedbackModel");
 const categoryModel  = require("../models/categoryModel");
 const responseModel  = require("../models/responseModel");
 const { validateFeedbackSubmission } = require("../lib/validation");
-const { AttachmentValidationError, validateAndNormalizeImage } = require("../lib/attachmentValidation");
-const attachmentStorage = require("../services/attachmentStorageService");
-const { streamFeedbackImage } = require("../services/attachmentDeliveryService");
 const logger = require("../lib/logger");
-
-async function renderSubmitForm(req, res, { errors, formData }) {
-  const categories = await categoryModel.getAllActive();
-  return res.status(422).render("student/feedback-form", {
-    title: "Submit Feedback - CSPC Feedback System",
-    user: req.session.user,
-    categories,
-    errors,
-    formData,
-  });
-}
 
 // ---------------------------------------------------------------
 // GET /student/dashboard
@@ -82,16 +68,9 @@ async function showSubmitForm(req, res, next) {
 // POST /feedback
 // ---------------------------------------------------------------
 async function submitFeedback(req, res, next) {
-  let uploadedImagePublicId = null;
-
   try {
     const { type, categoryId, priority, subject, description, isAnonymous } = req.body;
     const userId = req.session.user.id;
-    const formData = { type, categoryId, priority, subject, description, isAnonymous };
-
-    if (req.attachmentError) {
-      return renderSubmitForm(req, res, { errors: [req.attachmentError], formData });
-    }
 
     // Server-side validation
     const { valid, errors } = validateFeedbackSubmission({
@@ -127,25 +106,6 @@ async function submitFeedback(req, res, next) {
     }
 
     const anonymous = isAnonymous === "1" || isAnonymous === "on" || isAnonymous === true;
-    let attachment = null;
-
-    if (req.file) {
-      try {
-        const normalizedImage = await validateAndNormalizeImage(req.file);
-        attachment = await attachmentStorage.uploadFeedbackImage(normalizedImage);
-        uploadedImagePublicId = attachment.publicId;
-        attachment.mimeType = normalizedImage.mimeType;
-      } catch (err) {
-        if (err instanceof AttachmentValidationError || err.status === 503) {
-          return renderSubmitForm(req, res, { errors: [err.message], formData });
-        }
-        logger.error("Feedback attachment upload failed", { message: err.message });
-        return renderSubmitForm(req, res, {
-          errors: ["The image could not be stored. Please try again later or submit feedback without an image."],
-          formData,
-        });
-      }
-    }
 
     const { insertId, referenceNumber } = await feedbackModel.create({
       userId,
@@ -155,10 +115,7 @@ async function submitFeedback(req, res, next) {
       subject,
       description,
       isAnonymous: anonymous,
-      imagePublicId: attachment ? attachment.publicId : null,
-      imageMimeType: attachment ? attachment.mimeType : null,
     });
-    uploadedImagePublicId = null;
 
     logger.info("Feedback submitted", {
       feedbackId: insertId,
@@ -177,9 +134,6 @@ async function submitFeedback(req, res, next) {
     }
     return res.redirect(303, `/feedback/${insertId}`);
   } catch (err) {
-    if (uploadedImagePublicId) {
-      await attachmentStorage.deleteFeedbackImage(uploadedImagePublicId);
-    }
     return next(err);
   }
 }
@@ -244,29 +198,4 @@ async function feedbackDetail(req, res, next) {
   }
 }
 
-async function feedbackImage(req, res, next) {
-  try {
-    const feedbackId = parseInt(req.params.id, 10);
-    if (isNaN(feedbackId)) {
-      return res.status(404).render("errors/404", { title: "Not Found", user: req.session.user });
-    }
-
-    const feedback = await feedbackModel.findByIdAndUser(feedbackId, req.session.user.id);
-    if (!feedback || !feedback.image_public_id || !feedback.image_mime_type) {
-      return res.status(404).render("errors/404", { title: "Attachment Not Found", user: req.session.user });
-    }
-
-    return streamFeedbackImage(res, feedback.image_public_id, feedback.image_mime_type);
-  } catch (err) {
-    return next(err);
-  }
-}
-
-module.exports = {
-  dashboard,
-  showSubmitForm,
-  submitFeedback,
-  listFeedback,
-  feedbackDetail,
-  feedbackImage,
-};
+module.exports = { dashboard, showSubmitForm, submitFeedback, listFeedback, feedbackDetail };

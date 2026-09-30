@@ -12,7 +12,6 @@ const express      = require("express");
 const rateLimit    = require("express-rate-limit");
 const feedbackCtrl = require("../controllers/feedbackController");
 const { requireLogin, requireRole } = require("../middleware/authMiddleware");
-const { handleFeedbackImageUpload } = require("../middleware/uploadMiddleware");
 
 const router = express.Router();
 
@@ -40,8 +39,7 @@ router.get("/feedback/new", requireLogin, feedbackCtrl.showSubmitForm);
 
 // Submit feedback
 // POST /feedback
-router.post("/feedback", requireLogin, submitLimiter, handleFeedbackImageUpload, feedbackCtrl.submitFeedback);
-router.get("/feedback/:id/image", requireLogin, feedbackCtrl.feedbackImage);
+router.post("/feedback", requireLogin, submitLimiter, feedbackCtrl.submitFeedback);
 
 // Feedback list (own submissions only)
 // GET /feedback
