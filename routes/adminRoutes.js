@@ -27,6 +27,7 @@ router.get("/dashboard", adminCtrl.dashboard);
 // Feedback management list
 // GET /admin/feedback
 router.get("/feedback", adminCtrl.listFeedback);
+router.get("/feedback/:id/image", adminCtrl.feedbackImage);
 
 // Feedback detail
 // GET /admin/feedback/:id

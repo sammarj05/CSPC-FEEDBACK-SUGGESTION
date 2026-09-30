@@ -145,6 +145,9 @@ See [`.env.example`](.env.example) for all required variables.
 | `GOOGLE_CLIENT_ID` | Google OAuth Client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret |
 | `GOOGLE_CALLBACK_URL` | OAuth callback URL |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name for private image attachments |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret (server-side only) |
 | `CSPC_EMAIL_DOMAIN` | Allowed email domain (e.g. `cspc.edu.ph`) |
 | `NODE_ENV` | `development` or `production` |
 
@@ -164,6 +167,16 @@ mysql -u root -p < seed.sql
 - Email: `admin@cspc.edu.ph`
 - Password: `Admin@CSPC2026`
 - âš ï¸ **Change this password immediately after first login.**
+
+### Existing databases: image attachment migration
+
+Do not re-run `schema.sql` against a deployed database. Before deploying image attachments, back up the hosted database and run this non-destructive migration once:
+
+```bash
+mysql -u <user> -p <database> < migrations/20260930_add_feedback_image_attachments.sql
+```
+
+Set the three `CLOUDINARY_*` variables in Render's Environment settings. Attachments are stored as private Cloudinary assets, rather than Render's ephemeral filesystem. Existing feedback remains valid because both new columns are nullable.
 
 ---
 
@@ -212,9 +225,11 @@ npm test
 | GET | `/feedback/new` | Auth | Feedback form |
 | POST | `/feedback` | Auth | Submit feedback |
 | GET | `/feedback` | Auth | My submissions |
+| GET | `/feedback/:id/image` | Owner | View own attached image |
 | GET | `/feedback/:id` | Auth | Feedback detail |
 | GET | `/admin/dashboard` | Admin | Admin dashboard |
 | GET | `/admin/feedback` | Admin | Manage feedback |
+| GET | `/admin/feedback/:id/image` | Admin | View attached image |
 | GET | `/admin/feedback/:id` | Admin | Feedback detail |
 | POST | `/admin/feedback/:id/status` | Admin | Update status |
 | POST | `/admin/feedback/:id/respond` | Admin | Add response |
@@ -246,6 +261,7 @@ Roles are stored in the database. Role checks are enforced **server-side** in mi
 - **Authorization**: `requireLogin` + `requireRole` middleware on every protected route.
 - **Ownership**: Student feedback queries include `WHERE user_id = ?` â€” no cross-account access.
 - **Rate Limiting**: Login, register, and feedback submission endpoints rate-limited.
+- **Attachments**: Images are limited to 5 MB, decoded and re-encoded with Sharp, stored as private Cloudinary assets, and streamed only after owner/admin authorization.
 - **Security Headers**: Helmet with Content Security Policy.
 - **OAuth Domain Restriction**: Only `cspc.edu.ph` Google accounts accepted.
 

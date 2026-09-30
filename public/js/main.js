@@ -88,12 +88,92 @@
 })();
 
 // ---------------------------------------------------------------
+// Feedback attachment preview and client-side validation
+// ---------------------------------------------------------------
+(function initFeedbackAttachment() {
+  const input = document.getElementById("attachment");
+  const preview = document.getElementById("attachmentPreview");
+  const previewImage = document.getElementById("attachmentPreviewImage");
+  const fileName = document.getElementById("attachmentFileName");
+  const removeButton = document.getElementById("removeAttachment");
+  const error = document.getElementById("attachmentError");
+  const form = document.getElementById("feedbackForm");
+  if (!input || !preview || !previewImage || !fileName || !removeButton || !error || !form) return;
+
+  const maxSize = 5 * 1024 * 1024;
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  let previewUrl = null;
+
+  function clearPreview() {
+    preview.hidden = true;
+    previewImage.removeAttribute("src");
+    fileName.textContent = "";
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+  }
+
+  function clearAttachment() {
+    input.value = "";
+    clearPreview();
+  }
+
+  function showError(message) {
+    error.textContent = message;
+    error.hidden = false;
+  }
+
+  function clearError() {
+    error.textContent = "";
+    error.hidden = true;
+  }
+
+  input.addEventListener("change", () => {
+    clearPreview();
+    clearError();
+    const [file] = input.files;
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+      showError("Only JPG, JPEG, PNG, and WebP images are allowed.");
+      clearAttachment();
+      return;
+    }
+    if (file.size > maxSize) {
+      showError("The image must be 5 MB or smaller.");
+      clearAttachment();
+      return;
+    }
+
+    previewUrl = URL.createObjectURL(file);
+    previewImage.src = previewUrl;
+    fileName.textContent = file.name;
+    preview.hidden = false;
+  });
+
+  removeButton.addEventListener("click", () => {
+    clearAttachment();
+    clearError();
+    input.focus();
+  });
+
+  form.addEventListener("submit", (event) => {
+    if (!input.files.length) return;
+    const [file] = input.files;
+    if (!allowedTypes.includes(file.type) || file.size > maxSize) {
+      event.preventDefault();
+      showError("Choose a JPG, JPEG, PNG, or WebP image that is 5 MB or smaller.");
+    }
+  });
+})();
+
+// ---------------------------------------------------------------
 // Form submit loading state (prevent double submission)
 // ---------------------------------------------------------------
 (function initFormLoadingState() {
   const forms = document.querySelectorAll("form");
   forms.forEach((form) => {
-    form.addEventListener("submit", () => {
+    form.addEventListener("submit", (event) => {
+      if (event.defaultPrevented) return;
       const submitBtn = form.querySelector('[type="submit"]');
       if (!submitBtn) return;
       submitBtn.disabled = true;

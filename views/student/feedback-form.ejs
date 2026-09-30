@@ -25,7 +25,7 @@
     <%- include('../partials/errors') %>
 
     <div class="form-card">
-      <form action="/feedback" method="POST" class="feedback-form" novalidate id="feedbackForm">
+      <form action="/feedback" method="POST" enctype="multipart/form-data" class="feedback-form" novalidate id="feedbackForm">
 
         <!-- Row: Type + Category -->
         <div class="form-row">
@@ -107,6 +107,27 @@
             aria-describedby="descCount"
           ><%= formData.description || '' %></textarea>
           <span class="form-char-count" id="descCount" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group attachment-field">
+          <label class="form-label" for="attachment">Attach an Image <span class="form-hint">(optional)</span></label>
+          <input
+            type="file"
+            id="attachment"
+            name="attachment"
+            class="form-file-input"
+            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+            aria-describedby="attachmentHint attachmentError"
+          />
+          <p class="form-hint" id="attachmentHint">JPG, JPEG, PNG, or WebP only. Maximum file size: 5 MB.</p>
+          <p class="form-error" id="attachmentError" role="alert" hidden></p>
+          <div class="attachment-preview" id="attachmentPreview" hidden>
+            <img id="attachmentPreviewImage" alt="Selected attachment preview" />
+            <div class="attachment-preview__details">
+              <span id="attachmentFileName"></span>
+              <button type="button" class="btn btn--ghost btn--sm" id="removeAttachment">Remove image</button>
+            </div>
+          </div>
         </div>
 
         <!-- Anonymous submission -->
