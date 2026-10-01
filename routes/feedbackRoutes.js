@@ -12,6 +12,7 @@ const express      = require("express");
 const rateLimit    = require("express-rate-limit");
 const feedbackCtrl = require("../controllers/feedbackController");
 const { requireLogin, requireRole } = require("../middleware/authMiddleware");
+const { handleFeedbackImageUpload } = require("../middleware/uploadMiddleware");
 
 const router = express.Router();
 
@@ -37,13 +38,17 @@ router.get(
 // GET /feedback/new
 router.get("/feedback/new", requireLogin, feedbackCtrl.showSubmitForm);
 
-// Submit feedback
+// Submit feedback (multipart/form-data for optional image attachment)
 // POST /feedback
-router.post("/feedback", requireLogin, submitLimiter, feedbackCtrl.submitFeedback);
+router.post("/feedback", requireLogin, submitLimiter, handleFeedbackImageUpload, feedbackCtrl.submitFeedback);
 
 // Feedback list (own submissions only)
 // GET /feedback
 router.get("/feedback", requireLogin, feedbackCtrl.listFeedback);
+
+// Attached image — owner-only (must be before :id wildcard)
+// GET /feedback/:id/image
+router.get("/feedback/:id/image", requireLogin, feedbackCtrl.feedbackImage);
 
 // Feedback detail (ownership-scoped)
 // GET /feedback/:id

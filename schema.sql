@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS feedback (
     priority        ENUM('low','medium','high') NOT NULL DEFAULT 'medium',
     subject         VARCHAR(255)    NOT NULL,
     description     TEXT            NOT NULL,
+    image_public_id VARCHAR(255)    NULL COMMENT 'Private Cloudinary asset identifier',
+    image_mime_type VARCHAR(50)     NULL COMMENT 'Validated attachment MIME type',
     is_anonymous    TINYINT(1)      NOT NULL DEFAULT 0,
     status          ENUM(
         'submitted',

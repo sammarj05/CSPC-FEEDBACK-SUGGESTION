@@ -28,9 +28,14 @@ router.get("/dashboard", adminCtrl.dashboard);
 // GET /admin/feedback
 router.get("/feedback", adminCtrl.listFeedback);
 
+// Attached image — admin (must be before :id wildcard)
+// GET /admin/feedback/:id/image
+router.get("/feedback/:id/image", adminCtrl.feedbackImage);
+
 // Feedback detail
 // GET /admin/feedback/:id
 router.get("/feedback/:id", adminCtrl.feedbackDetail);
+
 
 // Update feedback status
 // POST /admin/feedback/:id/status

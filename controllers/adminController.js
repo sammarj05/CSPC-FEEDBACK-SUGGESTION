@@ -18,6 +18,7 @@ const feedbackModel  = require("../models/feedbackModel");
 const responseModel  = require("../models/responseModel");
 const categoryModel  = require("../models/categoryModel");
 const { validateAdminResponse, validateStatusChange, sanitize } = require("../lib/validation");
+const { streamFeedbackImage } = require("../services/attachmentDeliveryService");
 const logger = require("../lib/logger");
 
 const VALID_STATUSES = ["submitted", "under_review", "in_progress", "resolved", "closed"];
@@ -177,4 +178,26 @@ async function addResponse(req, res, next) {
   }
 }
 
-module.exports = { dashboard, listFeedback, feedbackDetail, updateStatus, addResponse };
+// ---------------------------------------------------------------
+// GET /admin/feedback/:id/image  — admin image stream
+// ---------------------------------------------------------------
+async function feedbackImage(req, res, next) {
+  try {
+    const feedbackId = parseInt(req.params.id, 10);
+    if (isNaN(feedbackId)) {
+      return res.status(404).render("errors/404", { title: "Not Found", user: req.session.user });
+    }
+
+    // Admin may view any feedback image (admin route is already protected by requireRole).
+    const feedback = await feedbackModel.findByIdAdmin(feedbackId);
+    if (!feedback || !feedback.image_public_id || !feedback.image_mime_type) {
+      return res.status(404).render("errors/404", { title: "Attachment Not Found", user: req.session.user });
+    }
+
+    return streamFeedbackImage(res, feedback.image_public_id, feedback.image_mime_type);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+module.exports = { dashboard, listFeedback, feedbackDetail, feedbackImage, updateStatus, addResponse };

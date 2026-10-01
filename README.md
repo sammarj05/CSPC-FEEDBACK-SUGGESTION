@@ -1,4 +1,4 @@
-﻿# CSPC Suggestion & Feedback System
+# CSPC Suggestion & Feedback System
 
 > A professional, dynamic, database-driven web application for **Camarines Sur Polytechnic Colleges** (CSPC) that allows students to submit suggestions, complaints, concerns, and feedback to authorized CSPC personnel.
 
@@ -32,6 +32,7 @@ The **CSPC Suggestion & Feedback System** is a full-stack Node.js web applicatio
 | Admin Dashboard | Real-time stats: counts by status, category, type |
 | Admin Feedback Management | Search, filter by status/category/type/priority, paginate |
 | Admin Responses | Official responses appear on student's feedback detail page |
+| Image Attachments | Optional JPG, PNG, WebP image attachments (up to 5 MB); persistent cloud storage via Cloudinary; authenticated delivery |
 | Security | bcrypt passwords, session management, Helmet headers, rate limiting, server-side authorization |
 | Aizen AI Chatbot | Floating AI assistant powered by Google Gemini; feedback status lookup; admin escalation |
 | Accessible UI | Semantic HTML, ARIA labels, keyboard navigation, responsive design |
@@ -46,6 +47,8 @@ The **CSPC Suggestion & Feedback System** is a full-stack Node.js web applicatio
 | Web Framework | Express.js |
 | View Engine | EJS |
 | Database | MySQL |
+| Persistent Storage | Cloudinary (ephemeral-safe remote image attachment store) |
+| Image Processing | Sharp (magic byte validation, dimension limits, EXIF metadata stripping) |
 | Authentication | express-session + bcrypt + Passport.js (Google OAuth 2.0) |
 | Security | Helmet, express-rate-limit |
 | Logging | Morgan (HTTP) + custom structured logger |
@@ -213,9 +216,11 @@ npm test
 | POST | `/feedback` | Auth | Submit feedback |
 | GET | `/feedback` | Auth | My submissions |
 | GET | `/feedback/:id` | Auth | Feedback detail |
+| GET | `/feedback/:id/image` | Auth | Stream attached feedback image (owner or admin only) |
 | GET | `/admin/dashboard` | Admin | Admin dashboard |
 | GET | `/admin/feedback` | Admin | Manage feedback |
 | GET | `/admin/feedback/:id` | Admin | Feedback detail |
+| GET | `/admin/feedback/:id/image` | Admin | Stream attached feedback image |
 | POST | `/admin/feedback/:id/status` | Admin | Update status |
 | POST | `/admin/feedback/:id/respond` | Admin | Add response |
 | POST | `/api/chat` | Public | Send message to Aizen AI |
@@ -335,6 +340,45 @@ Users can click **"Talk to an Admin"** at any time. This:
 3. Makes the conversation visible to admins at /admin/chat.
 
 Admins can view all conversations at /admin/chat and reply directly to users. Admin messages are clearly labeled **"Administrator"** — never confused with Aizen AI messages.
+
+---
+
+## Feedback Image Attachments & Cloudinary Setup
+
+Students can optionally attach an image (JPG, PNG, WebP up to 5 MB) to their feedback submission (e.g., photo of facility damage, screenshot, document).
+
+### Persistent Storage on Render
+
+Render's standard web services have ephemeral filesystems. Uploads stored on local disk disappear on redeploys and restarts. To solve this:
+1. Uploaded files are received in-memory via Multer (`storage: memoryStorage()`).
+2. Images are strictly validated with **Sharp** (magic bytes, dimensions, re-encoding to strip EXIF/GPS metadata).
+3. The image is uploaded as a **private** asset to **Cloudinary**.
+4. The database stores only the `image_public_id` and `image_mime_type`.
+5. Images are never served via public Cloudinary URLs. Instead, the backend streams the image via `/feedback/:id/image` (or `/admin/feedback/:id/image`), enforcing application authentication, ownership checks, and anonymous feedback privacy.
+
+### Environment Variables for Production (Render Dashboard)
+
+Add these environment variables in your Render Web Service dashboard (**Environment** tab):
+
+```ini
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+```
+
+*(Alternatively, you can provide the single `CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name` connection string.)*
+
+### Database Migration
+
+To add the required columns (`image_public_id` and `image_mime_type`) to the MySQL database:
+
+```bash
+# Automated migration script (safe & idempotent):
+node scripts/migrate-images.js
+
+# Or execute the SQL migration file directly:
+# migrations/20260930_add_feedback_image_attachments.sql
+```
 
 ## Known Issues
 

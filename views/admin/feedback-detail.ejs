@@ -96,6 +96,18 @@
           </div>
         </div>
 
+        <div class="detail-card">
+          <h2 class="detail-card__title">Attached Image</h2>
+          <% if (feedback.image_public_id) { %>
+            <a class="feedback-attachment" href="/admin/feedback/<%= feedback.id %>/image" target="_blank" rel="noopener">
+              <img src="/admin/feedback/<%= feedback.id %>/image" alt="Attachment for feedback <%= feedback.reference_number %>" />
+              <span>Open full-size image</span>
+            </a>
+          <% } else { %>
+            <p class="empty-inline">No image was attached to this feedback.</p>
+          <% } %>
+        </div>
+
         <!-- Update Status -->
         <div class="detail-card">
           <h2 class="detail-card__title">Update Status</h2>

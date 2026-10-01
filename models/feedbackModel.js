@@ -26,11 +26,11 @@ const db = require("../config/database");
  *
  * @returns {Promise<string>}
  */
-async function generateReferenceNumber() {
+async function generateReferenceNumber(connection = db) {
   const year = new Date().getFullYear();
   const prefix = `FB-${year}-`;
 
-  const [rows] = await db.query(
+  const [rows] = await connection.query(
     `SELECT reference_number
      FROM feedback
      WHERE reference_number LIKE ?
@@ -55,47 +55,71 @@ async function generateReferenceNumber() {
 
 /**
  * Insert a new feedback record and record the initial status history.
+ * Wrapped in a transaction to ensure the feedback row and status history
+ * are written atomically — or rolled back together on failure.
  *
  * IMPORTANT: user_id is ALWAYS stored as the real student ID, even for
  * anonymous submissions. The is_anonymous flag controls visibility —
  * admin queries mask the identity via CASE WHEN, but the student's own
  * ownership queries (WHERE user_id = ?) still work correctly.
  *
- * @param {{ userId, categoryId, type, priority, subject, description, isAnonymous }} data
+ * @param {{ userId, categoryId, type, priority, subject, description, isAnonymous, imagePublicId, imageMimeType }} data
  * @returns {Promise<{ insertId: number, referenceNumber: string }>}
  */
-async function create({ userId, categoryId, type, priority, subject, description, isAnonymous }) {
-  const referenceNumber = await generateReferenceNumber();
+async function create({
+  userId,
+  categoryId,
+  type,
+  priority,
+  subject,
+  description,
+  isAnonymous,
+  imagePublicId = null,
+  imageMimeType = null,
+}) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+    const referenceNumber = await generateReferenceNumber(connection);
 
-  // Always store the real userId — never null it out for anonymous submissions.
-  // is_anonymous = 1 tells admin queries to mask identity; student queries
-  // use WHERE user_id = ? which needs a real value to match.
-  const storedUserId = userId ? parseInt(userId, 10) : null;
+    // Always store the real userId — never null it out for anonymous submissions.
+    // is_anonymous = 1 tells admin queries to mask identity; student queries
+    // use WHERE user_id = ? which needs a real value to match.
+    const storedUserId = userId ? parseInt(userId, 10) : null;
 
-  const [result] = await db.query(
-    `INSERT INTO feedback
-       (reference_number, user_id, category_id, type, priority, subject, description, is_anonymous, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'submitted')`,
-    [
-      referenceNumber,
-      storedUserId,
-      categoryId,
-      type,
-      priority,
-      subject.trim(),
-      description.trim(),
-      isAnonymous ? 1 : 0,
-    ]
-  );
+    const [result] = await connection.query(
+      `INSERT INTO feedback
+         (reference_number, user_id, category_id, type, priority, subject, description, image_public_id, image_mime_type, is_anonymous, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted')`,
+      [
+        referenceNumber,
+        storedUserId,
+        categoryId,
+        type,
+        priority,
+        subject.trim(),
+        description.trim(),
+        imagePublicId,
+        imageMimeType,
+        isAnonymous ? 1 : 0,
+      ]
+    );
 
-  // Record initial status history
-  await db.query(
-    `INSERT INTO feedback_status_history (feedback_id, changed_by, old_status, new_status, note)
-     VALUES (?, NULL, NULL, 'submitted', 'Feedback submitted by student.')`,
-    [result.insertId]
-  );
+    // Record initial status history
+    await connection.query(
+      `INSERT INTO feedback_status_history (feedback_id, changed_by, old_status, new_status, note)
+       VALUES (?, NULL, NULL, 'submitted', 'Feedback submitted by student.')`,
+      [result.insertId]
+    );
 
-  return { insertId: result.insertId, referenceNumber };
+    await connection.commit();
+    return { insertId: result.insertId, referenceNumber };
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
 }
 
 // ---------------------------------------------------------------
@@ -157,7 +181,8 @@ async function findByIdAndUser(feedbackId, userId) {
 async function findByReference(referenceNumber) {
   const [rows] = await db.query(
     `SELECT f.id, f.reference_number, f.category_id, f.type, f.priority,
-            f.subject, f.description, f.is_anonymous, f.status, f.created_at, f.updated_at,
+            f.subject, f.description, f.image_public_id, f.image_mime_type,
+            f.is_anonymous, f.status, f.created_at, f.updated_at,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE f.user_id END AS user_id,
             c.name AS category_name,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name,
@@ -183,7 +208,8 @@ async function findByReference(referenceNumber) {
 async function findByIdAdmin(id) {
   const [rows] = await db.query(
     `SELECT f.id, f.reference_number, f.category_id, f.type, f.priority,
-            f.subject, f.description, f.is_anonymous, f.status, f.created_at, f.updated_at,
+            f.subject, f.description, f.image_public_id, f.image_mime_type,
+            f.is_anonymous, f.status, f.created_at, f.updated_at,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE f.user_id END AS user_id,
             c.name AS category_name,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name,
@@ -248,6 +274,7 @@ async function adminList({ status, categoryId, type, priority, search, page = 1,
   const [rows] = await db.query(
     `SELECT f.id, f.reference_number, f.subject, f.type, f.priority,
             f.status, f.is_anonymous, f.created_at, f.updated_at,
+            (f.image_public_id IS NOT NULL) AS has_image,
             c.name AS category_name,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name
      FROM   feedback f
