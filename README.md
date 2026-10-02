@@ -23,7 +23,7 @@ The **CSPC Suggestion & Feedback System** is a full-stack Node.js web applicatio
 
 | Feature | Details |
 |---|---|
-| Student Registration & Login | Manual email/password or **Login with CSPC Email** (Google OAuth, domain-restricted to `cspc.edu.ph`) |
+| Student Registration & Login | Manual email/password or **Login with Google** (Google OAuth 2.0; automatic student profile provisioning) |
 | Feedback Submission | Types: Suggestion, Complaint, Concern, General Feedback, Appreciation |
 | Unique Reference Numbers | Format: `FB-YYYY-#####`, generated dynamically |
 | Status Tracking | Submitted â†’ Under Review â†’ In Progress â†’ Resolved â†’ Closed |
@@ -252,7 +252,7 @@ Roles are stored in the database. Role checks are enforced **server-side** in mi
 - **Ownership**: Student feedback queries include `WHERE user_id = ?` â€” no cross-account access.
 - **Rate Limiting**: Login, register, and feedback submission endpoints rate-limited.
 - **Security Headers**: Helmet with Content Security Policy.
-- **OAuth Domain Restriction**: Only `cspc.edu.ph` Google accounts accepted.
+- **OAuth Authentication**: Google OAuth 2.0 integrated (configurable institutional domain filtering via `CSPC_EMAIL_DOMAIN`).
 
 ---
 
@@ -400,7 +400,7 @@ MIT License â€” see [`LICENSE`](LICENSE).
 
 ## Live Application
 
-> Deployment in progress. URL will be updated here once the system is live.
+> Deployed production web application running on Render with Filess.io MySQL:
 
-`https://YOUR-DOMAIN-HERE`
+**[https://cspcfeedbacksuggest.me](https://cspcfeedbacksuggest.me)**
 
