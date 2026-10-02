@@ -36,6 +36,10 @@ router.get("/feedback/:id/image", adminCtrl.feedbackImage);
 // GET /admin/feedback/:id
 router.get("/feedback/:id", adminCtrl.feedbackDetail);
 
+// Community Feed management
+router.post("/feedback/:id/publication", adminCtrl.updatePublication);
+router.get("/community/comments", adminCtrl.listCommunityComments);
+router.post("/community/comments/:id/visibility", adminCtrl.updateCommentVisibility);
 
 // Update feedback status
 // POST /admin/feedback/:id/status

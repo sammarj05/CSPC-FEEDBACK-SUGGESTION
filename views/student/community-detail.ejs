@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'community' }) %>
+
+  <div class="page-header">
+    <div class="container page-header__row">
+      <div>
+        <h1 class="page-header__title"><%= feedback.subject %></h1>
+        <p class="page-header__subtitle">Community discussion and official status</p>
+      </div>
+      <a class="btn btn--secondary btn--sm" href="/community">← Back to Community Feed</a>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+    <% if (flashSuccess && flashSuccess.length > 0) { %>
+      <div class="flash flash--success" role="alert" aria-live="polite"><%= flashSuccess[0] %></div>
+    <% } %>
+    <% if (flashError && flashError.length > 0) { %>
+      <div class="flash flash--error" role="alert"><%= flashError[0] %></div>
+    <% } %>
+
+    <div class="community-detail-layout">
+      <section class="detail-card community-detail-card">
+        <div class="community-card__header">
+          <span class="type-chip"><%= feedback.type.replace(/_/g, ' ') %></span>
+          <%- include('../partials/status-badge', { status: feedback.status }) %>
+        </div>
+        <p class="community-detail-card__description"><%= feedback.description %></p>
+        <dl class="community-detail-meta">
+          <div><dt>Submitted by</dt><dd><%= feedback.author_label %></dd></div>
+          <div><dt>Category</dt><dd><%= feedback.category_name %></dd></div>
+          <div><dt>Published</dt><dd><time datetime="<%= feedback.published_at %>"><%= new Date(feedback.published_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) %></time></dd></div>
+          <div><dt>Official status</dt><dd><%- include('../partials/status-badge', { status: feedback.status }) %></dd></div>
+        </dl>
+      </section>
+
+      <section class="detail-card" aria-labelledby="community-response-title">
+        <h2 class="detail-card__title" id="community-response-title">Community Response</h2>
+        <div class="reaction-summary">
+          <span><strong><%= feedback.support_count %></strong> Support</span>
+          <span><strong><%= feedback.not_helpful_count %></strong> Not Helpful</span>
+        </div>
+        <div class="reaction-actions">
+          <form action="/community/feedback/<%= feedback.id %>/reaction" method="POST">
+            <input type="hidden" name="reactionType" value="support" />
+            <button class="btn btn--sm <%= feedback.current_reaction === 'support' ? 'btn--primary' : 'btn--secondary' %>" type="submit" aria-pressed="<%= feedback.current_reaction === 'support' ? 'true' : 'false' %>">Support<%= feedback.current_reaction === 'support' ? ' ✓' : '' %></button>
+          </form>
+          <form action="/community/feedback/<%= feedback.id %>/reaction" method="POST">
+            <input type="hidden" name="reactionType" value="not_helpful" />
+            <button class="btn btn--sm <%= feedback.current_reaction === 'not_helpful' ? 'btn--primary' : 'btn--secondary' %>" type="submit" aria-pressed="<%= feedback.current_reaction === 'not_helpful' ? 'true' : 'false' %>">Not Helpful<%= feedback.current_reaction === 'not_helpful' ? ' ✓' : '' %></button>
+          </form>
+        </div>
+      </section>
+
+      <section class="detail-card" id="comments" aria-labelledby="comments-title">
+        <h2 class="detail-card__title" id="comments-title">Comments <span class="badge badge--count"><%= comments.length %></span></h2>
+        <% if (comments.length === 0) { %>
+          <p class="empty-inline">Be the first to share your thoughts.</p>
+        <% } else { %>
+          <div class="community-comments">
+            <% comments.forEach(function(comment) { %>
+              <article class="community-comment">
+                <div class="community-comment__header">
+                  <strong><%= comment.author_label %></strong>
+                  <time datetime="<%= comment.created_at %>"><%= new Date(comment.created_at).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) %></time>
+                </div>
+                <p><%= comment.comment_text %></p>
+              </article>
+            <% }); %>
+          </div>
+        <% } %>
+
+        <form class="community-comment-form" action="/community/feedback/<%= feedback.id %>/comments" method="POST">
+          <label class="form-label" for="commentText">Write a constructive comment</label>
+          <textarea class="form-textarea" id="commentText" name="commentText" rows="4" maxlength="500" required aria-describedby="commentHelp"></textarea>
+          <p class="form-hint" id="commentHelp">Maximum 500 characters. Comments are visible to the CSPC community.</p>
+          <button class="btn btn--primary" type="submit">Post Comment</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

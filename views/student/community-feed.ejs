@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'community' }) %>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-header__title">Community Feed</h1>
+      <p class="page-header__subtitle">Read published feedback, share support, and join constructive discussions.</p>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+    <% if (flashSuccess && flashSuccess.length > 0) { %>
+      <div class="flash flash--success" role="alert" aria-live="polite"><%= flashSuccess[0] %></div>
+    <% } %>
+    <% if (flashError && flashError.length > 0) { %>
+      <div class="flash flash--error" role="alert"><%= flashError[0] %></div>
+    <% } %>
+
+    <form class="filter-form" action="/community" method="GET" role="search" aria-label="Search community feedback">
+      <div class="filter-row">
+        <div class="filter-group filter-group--grow">
+          <label class="filter-label" for="communitySearch">Search feedback</label>
+          <input id="communitySearch" class="form-input form-input--sm" type="search" name="search" value="<%= filters.search %>" maxlength="100" placeholder="Search subjects, details, or categories" />
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="communityType">Feedback type</label>
+          <select id="communityType" class="form-select form-select--sm" name="type">
+            <option value="">All</option>
+            <option value="suggestion" <%= filters.type === 'suggestion' ? 'selected' : '' %>>Suggestions</option>
+            <option value="complaint" <%= filters.type === 'complaint' ? 'selected' : '' %>>Complaints</option>
+            <option value="concern" <%= filters.type === 'concern' ? 'selected' : '' %>>Concerns</option>
+            <option value="general_feedback" <%= filters.type === 'general_feedback' ? 'selected' : '' %>>General Feedback</option>
+            <option value="appreciation" <%= filters.type === 'appreciation' ? 'selected' : '' %>>Appreciation</option>
+          </select>
+        </div>
+        <div class="filter-group filter-group--actions">
+          <button class="btn btn--primary btn--sm" type="submit">Apply</button>
+          <a class="btn btn--ghost btn--sm" href="/community">Clear</a>
+        </div>
+      </div>
+    </form>
+
+    <% if (feedbackList.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-state__icon" aria-hidden="true">&#128172;</div>
+        <h2 class="empty-state__title"><%= filters.search || filters.type ? 'No feedback matches your search.' : 'No community feedback has been published yet.' %></h2>
+        <p class="empty-state__text">Published suggestions and feedback will appear here.</p>
+      </div>
+    <% } else { %>
+      <section class="community-feed" aria-label="Published community feedback">
+        <% feedbackList.forEach(function(feedback) { %>
+          <article class="community-card">
+            <div class="community-card__header">
+              <span class="type-chip"><%= feedback.type.replace(/_/g, ' ') %></span>
+              <%- include('../partials/status-badge', { status: feedback.status }) %>
+            </div>
+            <h2 class="community-card__title"><a href="/community/feedback/<%= feedback.id %>"><%= feedback.subject %></a></h2>
+            <p class="community-card__description"><%= feedback.description %></p>
+            <div class="community-card__meta">
+              <span><%= feedback.author_label %></span>
+              <span><%= feedback.category_name %></span>
+              <time datetime="<%= feedback.published_at %>">Published <%= new Date(feedback.published_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' }) %></time>
+            </div>
+            <div class="community-card__footer">
+              <div class="community-counts" aria-label="Community response counts">
+                <span>Support <strong><%= feedback.support_count %></strong></span>
+                <span>Not helpful <strong><%= feedback.not_helpful_count %></strong></span>
+                <span>Comments <strong><%= feedback.comment_count %></strong></span>
+              </div>
+              <a class="btn btn--secondary btn--sm" href="/community/feedback/<%= feedback.id %>">View Discussion</a>
+            </div>
+          </article>
+        <% }); %>
+      </section>
+
+      <% if (pagination.totalPages > 1) { %>
+        <nav class="pagination" aria-label="Community feed pagination">
+          <% if (pagination.currentPage > 1) { %>
+            <a class="pagination__link" href="?page=<%= pagination.currentPage - 1 %>&amp;type=<%= filters.type || '' %>&amp;search=<%= encodeURIComponent(filters.search || '') %>">← Previous</a>
+          <% } %>
+          <span class="pagination__info">Page <%= pagination.currentPage %> of <%= pagination.totalPages %></span>
+          <% if (pagination.currentPage < pagination.totalPages) { %>
+            <a class="pagination__link" href="?page=<%= pagination.currentPage + 1 %>&amp;type=<%= filters.type || '' %>&amp;search=<%= encodeURIComponent(filters.search || '') %>">Next →</a>
+          <% } %>
+        </nav>
+      <% } %>
+    <% } %>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

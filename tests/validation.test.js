@@ -6,6 +6,7 @@ import {
   validateLogin,
   validateFeedbackSubmission,
   validateAdminResponse,
+  validateCommunityComment,
   validateStatusChange,
   validateText,
   validateEnum,
@@ -222,6 +223,21 @@ describe("validateAdminResponse()", () => {
   });
   it("fails for message exceeding 5000 chars", () => {
     expect(validateAdminResponse({ message: "x".repeat(5001) }).valid).toBe(false);
+  });
+});
+
+describe("validateCommunityComment()", () => {
+  it("passes for a constructive comment", () => {
+    expect(validateCommunityComment({ commentText: "I experience this issue as well." }).valid).toBe(true);
+  });
+  it("rejects an empty or whitespace-only comment", () => {
+    expect(validateCommunityComment({ commentText: "   " }).valid).toBe(false);
+  });
+  it("rejects comments over 500 characters", () => {
+    expect(validateCommunityComment({ commentText: "x".repeat(501) }).valid).toBe(false);
+  });
+  it("allows text that EJS will render as escaped content", () => {
+    expect(validateCommunityComment({ commentText: "<script>alert('xss')</script>" }).valid).toBe(true);
   });
 });
 

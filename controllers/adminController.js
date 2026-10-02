@@ -17,6 +17,7 @@
 const feedbackModel  = require("../models/feedbackModel");
 const responseModel  = require("../models/responseModel");
 const categoryModel  = require("../models/categoryModel");
+const communityModel = require("../models/communityModel");
 const { validateAdminResponse, validateStatusChange, sanitize } = require("../lib/validation");
 const { streamFeedbackImage } = require("../services/attachmentDeliveryService");
 const logger = require("../lib/logger");
@@ -179,6 +180,93 @@ async function addResponse(req, res, next) {
 }
 
 // ---------------------------------------------------------------
+// POST /admin/feedback/:id/publication
+// ---------------------------------------------------------------
+async function updatePublication(req, res, next) {
+  try {
+    const feedbackId = parseInt(req.params.id, 10);
+    const isPublished = req.body.isPublished;
+    if (isNaN(feedbackId) || !["0", "1"].includes(isPublished)) {
+      req.flash("error", "Invalid publication request.");
+      return res.redirect(303, "/admin/feedback");
+    }
+
+    const updated = await communityModel.setPublication({
+      feedbackId,
+      isPublished: isPublished === "1",
+      adminId: req.session.user.id,
+    });
+    if (!updated) {
+      req.flash("error", "Feedback record not found.");
+      return res.redirect(303, "/admin/feedback");
+    }
+
+    const message = isPublished === "1"
+      ? "Feedback published to the Community Feed."
+      : "Feedback removed from the Community Feed.";
+    logger.info("Community publication updated", {
+      feedbackId,
+      isPublished: isPublished === "1",
+      adminId: req.session.user.id,
+    });
+    req.flash("success", message);
+    return res.redirect(303, `/admin/feedback/${feedbackId}`);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+// ---------------------------------------------------------------
+// GET /admin/community/comments
+// ---------------------------------------------------------------
+async function listCommunityComments(req, res, next) {
+  try {
+    const currentPage = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const { rows, total } = await communityModel.adminComments({
+      page: currentPage,
+      perPage: 20,
+    });
+    return res.render("admin/community-comments", {
+      title: "Community Comment Moderation — CSPC Feedback System",
+      user: req.session.user,
+      comments: rows,
+      pagination: {
+        currentPage,
+        totalPages: Math.ceil(total / 20),
+        total,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+// ---------------------------------------------------------------
+// POST /admin/community/comments/:id/visibility
+// ---------------------------------------------------------------
+async function updateCommentVisibility(req, res, next) {
+  try {
+    const commentId = parseInt(req.params.id, 10);
+    const isHidden = req.body.isHidden;
+    if (isNaN(commentId) || !["0", "1"].includes(isHidden)) {
+      req.flash("error", "Invalid comment moderation request.");
+      return res.redirect(303, "/admin/community/comments");
+    }
+
+    const updated = await communityModel.setCommentVisibility(commentId, isHidden === "1");
+    if (!updated) {
+      req.flash("error", "Comment not found.");
+      return res.redirect(303, "/admin/community/comments");
+    }
+
+    req.flash("success", isHidden === "1" ? "Comment hidden from students." : "Comment restored for students.");
+    return res.redirect(303, "/admin/community/comments");
+  } catch (err) {
+    return next(err);
+  }
+}
+
+// ---------------------------------------------------------------
 // GET /admin/feedback/:id/image  — admin image stream
 // ---------------------------------------------------------------
 async function feedbackImage(req, res, next) {
@@ -200,4 +288,14 @@ async function feedbackImage(req, res, next) {
   }
 }
 
-module.exports = { dashboard, listFeedback, feedbackDetail, feedbackImage, updateStatus, addResponse };
+module.exports = {
+  dashboard,
+  listFeedback,
+  feedbackDetail,
+  feedbackImage,
+  updateStatus,
+  addResponse,
+  updatePublication,
+  listCommunityComments,
+  updateCommentVisibility,
+};

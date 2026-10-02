@@ -182,7 +182,8 @@ async function findByReference(referenceNumber) {
   const [rows] = await db.query(
     `SELECT f.id, f.reference_number, f.category_id, f.type, f.priority,
             f.subject, f.description, f.image_public_id, f.image_mime_type,
-            f.is_anonymous, f.status, f.created_at, f.updated_at,
+            f.is_anonymous, f.status, f.is_published, f.published_at, f.published_by,
+            f.created_at, f.updated_at,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE f.user_id END AS user_id,
             c.name AS category_name,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name,
@@ -209,7 +210,8 @@ async function findByIdAdmin(id) {
   const [rows] = await db.query(
     `SELECT f.id, f.reference_number, f.category_id, f.type, f.priority,
             f.subject, f.description, f.image_public_id, f.image_mime_type,
-            f.is_anonymous, f.status, f.created_at, f.updated_at,
+            f.is_anonymous, f.status, f.is_published, f.published_at, f.published_by,
+            f.created_at, f.updated_at,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE f.user_id END AS user_id,
             c.name AS category_name,
             CASE WHEN f.is_anonymous = 1 THEN NULL ELSE u.name END AS student_name,

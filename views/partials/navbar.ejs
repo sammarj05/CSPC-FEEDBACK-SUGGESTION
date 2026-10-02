@@ -24,12 +24,14 @@
         <% if (currentUser.role === 'student') { %>
           <a href="/student/dashboard" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'dashboard') { %>navbar__link--active<% } %>">Dashboard</a>
           <a href="/feedback" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'my-feedback') { %>navbar__link--active<% } %>">My Submissions</a>
+          <a href="/community" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'community') { %>navbar__link--active<% } %>">Community Feed</a>
           <a href="/feedback/new" class="navbar__link navbar__link--cta">Submit Feedback</a>
         <% } %>
 
         <% if (currentUser.role === 'admin') { %>
           <a href="/admin/dashboard" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'admin-dashboard') { %>navbar__link--active<% } %>">Dashboard</a>
           <a href="/admin/feedback" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'admin-feedback') { %>navbar__link--active<% } %>">Feedback</a>
+          <a href="/admin/community/comments" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'admin-community') { %>navbar__link--active<% } %>">Comments</a>
           <a href="/admin/chat" class="navbar__link <% if (typeof activePage !== 'undefined' && activePage === 'admin-chat') { %>navbar__link--active<% } %>">Chat</a>
         <% } %>
 

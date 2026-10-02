@@ -129,6 +129,25 @@
                         <% } %>
                   </div>
 
+                  <!-- Community Feed Publication -->
+                  <div class="detail-card">
+                    <h2 class="detail-card__title">Community Feed Publication</h2>
+                    <% if (feedback.is_published) { %>
+                      <p class="community-admin-status">This feedback is visible to students in the Community Feed.</p>
+                      <form action="/admin/feedback/<%= feedback.id %>/publication" method="POST" class="admin-action-form">
+                        <input type="hidden" name="isPublished" value="0" />
+                        <button type="submit" class="btn btn--danger">Remove from Community Feed</button>
+                      </form>
+                    <% } else { %>
+                      <p class="community-admin-status">This feedback is private and is not visible in the Community Feed.</p>
+                      <form action="/admin/feedback/<%= feedback.id %>/publication" method="POST" class="admin-action-form">
+                        <input type="hidden" name="isPublished" value="1" />
+                        <button type="submit" class="btn btn--primary">Publish to Community Feed</button>
+                      </form>
+                    <% } %>
+                    <p class="form-hint">Publishing shares the feedback content and official status only. Anonymous submissions remain anonymous.</p>
+                  </div>
+
                   <!-- Update Status -->
                   <div class="detail-card">
                     <h2 class="detail-card__title">Update Status</h2>

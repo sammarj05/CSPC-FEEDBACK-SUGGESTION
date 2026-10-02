@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <%- include('../partials/navbar', { activePage: 'admin-community' }) %>
+
+  <div class="page-header page-header--admin">
+    <div class="container">
+      <h1 class="page-header__title">Community Comment Moderation</h1>
+      <p class="page-header__subtitle">Hide or restore student comments without deleting records.</p>
+    </div>
+  </div>
+
+  <main class="container section" id="main-content">
+    <% if (flashSuccess && flashSuccess.length > 0) { %>
+      <div class="flash flash--success" role="alert" aria-live="polite"><%= flashSuccess[0] %></div>
+    <% } %>
+    <% if (flashError && flashError.length > 0) { %>
+      <div class="flash flash--error" role="alert"><%= flashError[0] %></div>
+    <% } %>
+
+    <% if (comments.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-state__icon" aria-hidden="true">&#128172;</div>
+        <h2 class="empty-state__title">No community comments yet</h2>
+        <p class="empty-state__text">Comments on published feedback will appear here.</p>
+      </div>
+    <% } else { %>
+      <div class="community-moderation-list">
+        <% comments.forEach(function(comment) { %>
+          <article class="community-moderation-card <%= comment.is_hidden ? 'community-moderation-card--hidden' : '' %>">
+            <div class="community-moderation-card__header">
+              <div>
+                <a href="/admin/feedback/<%= comment.feedback_id %>" class="table-link"><%= comment.reference_number %></a>
+                <span class="community-moderation-card__subject"><%= comment.subject %></span>
+              </div>
+              <span class="badge <%= comment.is_hidden ? 'badge--anon' : 'badge--count' %>"><%= comment.is_hidden ? 'Hidden' : 'Visible' %></span>
+            </div>
+            <p class="community-moderation-card__text"><%= comment.comment_text %></p>
+            <div class="community-moderation-card__footer">
+              <time datetime="<%= comment.created_at %>"><%= new Date(comment.created_at).toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }) %></time>
+              <form action="/admin/community/comments/<%= comment.id %>/visibility" method="POST">
+                <input type="hidden" name="isHidden" value="<%= comment.is_hidden ? '0' : '1' %>" />
+                <button type="submit" class="btn btn--sm <%= comment.is_hidden ? 'btn--secondary' : 'btn--danger' %>"><%= comment.is_hidden ? 'Restore Comment' : 'Hide Comment' %></button>
+              </form>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+
+      <% if (pagination.totalPages > 1) { %>
+        <nav class="pagination" aria-label="Comment pagination">
+          <% if (pagination.currentPage > 1) { %>
+            <a class="pagination__link" href="?page=<%= pagination.currentPage - 1 %>">← Previous</a>
+          <% } %>
+          <span class="pagination__info">Page <%= pagination.currentPage %> of <%= pagination.totalPages %></span>
+          <% if (pagination.currentPage < pagination.totalPages) { %>
+            <a class="pagination__link" href="?page=<%= pagination.currentPage + 1 %>">Next →</a>
+          <% } %>
+        </nav>
+      <% } %>
+    <% } %>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

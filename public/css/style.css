@@ -401,6 +401,17 @@ h6 {
   background: var(--color-bg-alt);
 }
 
+.btn--danger {
+  background: #b42318;
+  color: white;
+  border-color: #b42318;
+}
+
+.btn--danger:hover {
+  background: #8f1d14;
+  border-color: #8f1d14;
+}
+
 .btn--ghost {
   background: transparent;
   color: var(--color-white);
@@ -1221,8 +1232,187 @@ h6 {
   align-items: flex-end;
 }
 
+.filter-group--grow {
+  flex: 1 1 280px;
+}
+
 /* ------------------------------------------------------------------
-   17. Admin action forms
+   17. Community feed
+------------------------------------------------------------------ */
+.community-feed,
+.community-comments,
+.community-moderation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.community-card,
+.community-moderation-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.community-card__header,
+.community-card__footer,
+.community-card__meta,
+.reaction-summary,
+.reaction-actions,
+.community-comment__header,
+.community-moderation-card__header,
+.community-moderation-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.community-card__header,
+.community-card__footer,
+.community-moderation-card__header,
+.community-moderation-card__footer {
+  justify-content: space-between;
+}
+
+.community-card__title {
+  font-size: 1.1rem;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.community-card__title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.community-card__title a:hover {
+  color: var(--color-primary);
+}
+
+.community-card__description,
+.community-detail-card__description,
+.community-comment p,
+.community-moderation-card__text {
+  color: var(--color-text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.community-card__description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.community-card__meta,
+.community-counts,
+.community-moderation-card__subject,
+.community-moderation-card__footer time {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.community-card__meta {
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+
+.community-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.community-card__footer {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.community-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+.community-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.community-detail-meta dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.community-detail-meta dd {
+  font-size: 0.875rem;
+}
+
+.reaction-summary {
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.reaction-actions form {
+  margin: 0;
+}
+
+.community-comment {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.community-comment__header {
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: var(--space-2);
+}
+
+.community-comment__header time {
+  color: var(--color-text-muted);
+}
+
+.community-comment-form {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.community-comment-form .btn {
+  margin-top: var(--space-2);
+}
+
+.community-admin-status {
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.community-moderation-card--hidden {
+  opacity: 0.72;
+  background: var(--color-bg-alt);
+}
+
+.community-moderation-card__text {
+  margin-block: var(--space-4);
+}
+
+/* ------------------------------------------------------------------
+   18. Admin action forms
 ------------------------------------------------------------------ */
 .admin-action-form {}
 
