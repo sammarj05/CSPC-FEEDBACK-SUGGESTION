@@ -38,12 +38,8 @@
   align-items: center;
   justify-content: center;
   width: 44px; height: 44px;
-  background: #1a56db;
-  color: white;
-  font-weight: 700;
-  font-size: 0.75rem;
-  border-radius: 0.5rem;
-  letter-spacing: 0.05em;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 .auth-brand__title { font-size: 0.95rem; font-weight: 600; color: #0f172a; display: block; line-height: 1.2; }
 .auth-brand__sub   { font-size: 0.7rem;  color: #64748b; display: block; line-height: 1.2; }
@@ -126,4 +122,3 @@
   height: 1px;
   background: #e2e8f0;
 }
-
