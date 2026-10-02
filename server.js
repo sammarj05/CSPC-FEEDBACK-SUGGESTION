@@ -17,7 +17,9 @@ require("dotenv").config();
 const app  = require("./app");
 const db   = require("./config/database");
 const PORT = process.env.PORT || 3000;
-
+//Gracefulshutdownsupport(closesHTTPserverandMYSQLpool)
+//appdevelopment  and demonstrationkeneme, not only is it blah. But its also blah
+//BAHAHHA app development // js
 const server = app.listen(PORT, () => {
   console.log(`[Server] CSPC Feedback System running on http://localhost:${PORT}`);
   console.log(`[Server] Environment: ${process.env.NODE_ENV || "development"}`);

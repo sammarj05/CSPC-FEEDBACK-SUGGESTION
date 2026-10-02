@@ -10,7 +10,9 @@
  *   4. Routes
  *   5. 404 handler
  *   6. Error handler (MUST be last)
- *
+ * //every single thing  is imported by server.js and server.js os imported by app.js
+ * // app.js is imported by server, is called by server.listen(), and is also imported by vitest and supper. baaah
+ * //everything is imported by server.js and server.js is imported by app.js 
  * IMPORTANT: app.listen() is NOT called here.
  * It lives in server.js so Vitest/SuperTest can import
  * the app without binding to a real port.
