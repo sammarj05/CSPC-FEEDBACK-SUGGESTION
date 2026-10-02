@@ -215,17 +215,10 @@ h6 {
 }
 
 .navbar__logo-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 40px;
   height: 40px;
-  background: var(--color-primary);
-  color: var(--color-white);
-  font-weight: 700;
-  font-size: 0.75rem;
-  border-radius: var(--radius);
-  letter-spacing: 0.05em;
+  object-fit: contain;
 }
 
 .navbar__brand-title {
@@ -1250,16 +1243,10 @@ h6 {
 }
 
 .footer__logo-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 36px;
   height: 36px;
-  background: var(--color-primary);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  border-radius: var(--radius);
+  object-fit: contain;
 }
 
 .footer__title {
