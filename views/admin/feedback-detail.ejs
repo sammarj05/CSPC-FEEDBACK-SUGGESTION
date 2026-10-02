@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= title %>
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+
+<body>
+  <%- include('../partials/navbar', { activePage: 'admin-feedback' }) %>
+
+    <div class="page-header page-header--admin">
+      <div class="container page-header__row">
+        <div>
+          <h1 class="page-header__title">
+            <%= feedback.reference_number %>
+          </h1>
+          <p class="page-header__subtitle">
+            <%= feedback.subject %>
+          </p>
+        </div>
+        <a href="/admin/feedback" class="btn btn--secondary btn--sm">← Back to Feedback</a>
+      </div>
+    </div>
+
+    <main class="container section" id="main-content">
+
+      <!-- Flash -->
+      <% if (typeof flashSuccess !=='undefined' && flashSuccess && flashSuccess.length> 0) { %>
+        <div class="flash flash--success" role="alert" aria-live="polite">✓ <%- flashSuccess[0] %>
+            <button class="flash__close" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+        </div>
+        <% } %>
+          <% if (typeof flashError !=='undefined' && flashError && flashError.length> 0) { %>
+            <div class="flash flash--error" role="alert">
+              <%= flashError[0] %>
+                <button class="flash__close" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <% } %>
+
+              <div class="detail-layout">
+
+                <!-- Left: Details + Actions -->
+                <div class="detail-main">
+
+                  <!-- Feedback info -->
+                  <div class="detail-card">
+                    <h2 class="detail-card__title">Feedback Details</h2>
+                    <dl class="detail-list">
+                      <div class="detail-item">
+                        <dt>Reference Number</dt>
+                        <dd><code class="ref-num"><%= feedback.reference_number %></code></dd>
+                      </div>
+                      <div class="detail-item">
+                        <dt>Submitted By</dt>
+                        <dd>
+                          <% if (feedback.is_anonymous) { %>
+                            <span class="badge badge--anon">Anonymous</span>
+                            <% } else { %>
+                              <%= feedback.student_name || '—' %>
+                                <% if (feedback.student_id_no) { %><span class="detail-sub">ID: <%=
+                                      feedback.student_id_no %></span>
+                                  <% } %>
+                                    <% if (feedback.student_email) { %><span class="detail-sub">
+                                        <%= feedback.student_email %>
+                                      </span>
+                                      <% } %>
+                                        <% } %>
+                        </dd>
+                      </div>
+                      <div class="detail-item">
+                        <dt>Type</dt>
+                        <dd><span class="type-chip">
+                            <%= feedback.type.replace(/_/g,' ') %></span></dd>
+            </div>
+            <div class="detail-item">
+              <dt>Category</dt>
+              <dd><%= feedback.category_name %></dd>
+            </div>
+            <div class="detail-item">
+              <dt>Priority</dt>
+              <dd><%- include(' ../partials/priority-badge', { priority: feedback.priority }) %>
+                        </dd>
+                      </div>
+                      <div class="detail-item">
+                        <dt>Current Status</dt>
+                        <dd><%- include('../partials/status-badge', { status: feedback.status }) %></dd>
+                      </div>
+                      <div class="detail-item">
+                        <dt>Submitted</dt>
+                        <dd>
+                          <time datetime="<%= feedback.created_at %>">
+                            <%= new Date(feedback.created_at).toLocaleString('en-PH', { dateStyle:'long',
+                              timeStyle:'short' }) %>
+                          </time>
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <div class="detail-card">
+                    <h2 class="detail-card__title">Description</h2>
+                    <div class="detail-description">
+                      <p>
+                        <%= feedback.description %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="detail-card">
+                    <h2 class="detail-card__title">Attached Image</h2>
+                    <% if (feedback.image_public_id) { %>
+                      <a class="feedback-attachment" href="/admin/feedback/<%= feedback.id %>/image" target="_blank"
+                        rel="noopener">
+                        <img src="/admin/feedback/<%= feedback.id %>/image"
+                          alt="Attachment for feedback <%= feedback.reference_number %>" />
+                        <span>Open full-size image</span>
+                      </a>
+                      <% } else { %>
+                        <p class="empty-inline">No image was attached to this feedback.</p>
+                        <% } %>
+                  </div>
+
+                  <!-- Update Status -->
+                  <div class="detail-card">
+                    <h2 class="detail-card__title">Update Status</h2>
+                    <form action="/admin/feedback/<%= feedback.id %>/status" method="POST" class="admin-action-form"
+                      id="statusForm">
+                      <div class="form-row form-row--compact">
+                        <div class="form-group">
+                          <label class="form-label" for="statusSelect">New Status</label>
+                          <select id="statusSelect" name="status" class="form-select">
+                            <% validStatuses.forEach(function(s) { %>
+                              <option value="<%= s %>" <%=feedback.status===s ? 'selected' : '' %>><%= s.replace(/_/g,' ') %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="form-group form-group--grow">
+                <label class="form-label" for="statusNote">Note <span class="form-hint">(optional)</span></label>
+                <input type="text" id="statusNote" name="note" class="form-input" placeholder="e.g. Forwarded to facilities office" maxlength="500" />
+              </div>
+              <button type="submit" class="btn btn--primary btn--self-end" id="statusUpdateBtn">Update Status</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Add Response -->
+        <div class="detail-card">
+          <h2 class="detail-card__title">Add Official Response</h2>
+          <form action="/admin/feedback/<%= feedback.id %>/respond" method="POST" class="admin-action-form" id="responseForm">
+            <div class="form-group">
+              <label class="form-label" for="responseMessage">Response Message <span class="form-required" aria-label="required">*</span></label>
+              <textarea
+                id="responseMessage"
+                name="message"
+                class="form-textarea"
+                rows="5"
+                maxlength="5000"
+                minlength="10"
+                placeholder="Type your official response here (minimum 10 characters)"
+                required
+                aria-required="true"
+                aria-describedby="responseCount"
+              ></textarea>
+              <span class="form-char-count" id="responseCount" aria-live="polite"></span>
+            </div>
+            <button type="submit" class="btn btn--primary" id="responseSubmitBtn">Send Response</button>
+          </form>
+        </div>
+
+        <!-- Existing Responses -->
+        <div class="detail-card">
+          <h2 class="detail-card__title">Response History
+            <% if (responses.length > 0) { %>
+              <span class="badge badge--count"><%= responses.length %></span>
+            <% } %>
+          </h2>
+          <% if (responses.length === 0) { %>
+            <p class="empty-inline">No responses added yet.</p>
+          <% } else { %>
+            <div class="responses-list">
+              <% responses.forEach(function(resp) { %>
+                <div class="response-item">
+                  <div class="response-item__header">
+                    <span class="response-item__author"><%= resp.admin_name || ' Administrator' %></span>
+                                  <time class="response-item__date" datetime="<%= resp.created_at %>">
+                                    <%= new Date(resp.created_at).toLocaleString('en-PH', { dateStyle:'medium',
+                                      timeStyle:'short' }) %>
+                                  </time>
+                        </div>
+                        <div class="response-item__body">
+                          <p>
+                            <%= resp.message %>
+                          </p>
+                        </div>
+                      </div>
+                      <% }); %>
+                  </div>
+                  <% } %>
+                </div>
+
+              </div>
+
+              <!-- Right: Timeline -->
+              <aside class="detail-sidebar" aria-label="Status timeline">
+                <div class="detail-card">
+                  <h2 class="detail-card__title">Status Timeline</h2>
+                  <ol class="timeline">
+                    <% statusHistory.forEach(function(h, idx) { %>
+                      <li
+                        class="timeline__item <% if (idx === statusHistory.length - 1) { %>timeline__item--current<% } %>">
+                        <div class="timeline__dot" aria-hidden="true"></div>
+                        <div class="timeline__content">
+                          <p class="timeline__status">
+                            <%- include('../partials/status-badge', { status: h.new_status }) %>
+                          </p>
+                          <time class="timeline__date" datetime="<%= h.created_at %>">
+                            <%= new Date(h.created_at).toLocaleString('en-PH', { dateStyle:'medium', timeStyle:'short'
+                              }) %>
+                          </time>
+                          <% if (h.changed_by_name) { %>
+                            <p class="timeline__note">by <%= h.changed_by_name %>
+                            </p>
+                            <% } %>
+                              <% if (h.note) { %>
+                                <p class="timeline__note">
+                                  <%= h.note %>
+                                </p>
+                                <% } %>
+                        </div>
+                      </li>
+                      <% }); %>
+                  </ol>
+                </div>
+              </aside>
+
+              </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+      <script src="/js/main.js"></script>
+</body>
+
+</html>
