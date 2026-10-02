@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= title %>
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+
+<body>
+  <%- include('../partials/navbar', { activePage: 'admin-chat' }) %>
+
+    <div class="page-header page-header--admin">
+      <div class="container">
+        <div
+          style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4);">
+          <div>
+            <h1 class="page-header__title">🤖 Aizen AI — Chat Conversations</h1>
+            <p class="page-header__subtitle">View and respond to escalated user conversations</p>
+          </div>
+          <a href="/admin/dashboard" class="btn btn--outline" style="font-size:0.875rem;">
+            ← Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <main class="container section" id="main-content">
+
+      <!-- Flash messages -->
+      <% if (typeof flashSuccess !=='undefined' && flashSuccess && flashSuccess.length> 0) { %>
+        <div class="flash flash--success" role="alert" aria-live="polite">✓ <%- flashSuccess[0] %>
+            <button class="flash__close" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+        </div>
+        <% } %>
+          <% if (typeof flashError !=='undefined' && flashError && flashError.length> 0) { %>
+            <div class="flash flash--error" role="alert">
+              <%= flashError[0] %>
+                <button class="flash__close" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <% } %>
+
+              <!-- Filter tabs -->
+              <div style="display:flex; gap:0.5rem; margin-bottom:var(--space-6); flex-wrap:wrap; align-items:center;">
+                <span style="font-size:0.82rem; color:var(--color-text-muted); font-weight:600;">Filter:</span>
+                <button onclick="filterConvs('all')" id="filterAll" class="btn btn--sm btn--primary">All</button>
+                <button onclick="filterConvs('escalated')" id="filterEscalated"
+                  class="btn btn--sm btn--outline">Escalated</button>
+                <button onclick="filterConvs('active')" id="filterActive"
+                  class="btn btn--sm btn--outline">Active</button>
+                <button onclick="filterConvs('closed')" id="filterClosed"
+                  class="btn btn--sm btn--outline">Closed</button>
+              </div>
+
+              <!-- Conversation list -->
+              <% if (!conversations || conversations.length===0) { %>
+                <div class="empty-state" style="text-align:center; padding:var(--space-12) var(--space-4);">
+                  <div style="font-size:3rem; margin-bottom:var(--space-4);">💬</div>
+                  <h2 style="font-size:1.1rem; color:var(--color-text-muted); font-weight:500; margin:0;">
+                    No chat conversations yet.
+                  </h2>
+                  <p style="color:var(--color-text-light); font-size:0.875rem; margin-top:0.5rem;">
+                    When users chat with Aizen AI, conversations will appear here.
+                  </p>
+                </div>
+                <% } else { %>
+                  <div class="admin-chat-list" id="convList">
+                    <% conversations.forEach(function(conv) { %>
+                      <a href="/admin/chat/<%= conv.id %>" class="admin-chat-item" data-status="<%= conv.status %>">
+                        <div class="admin-chat-item__meta">
+                          <div class="admin-chat-item__user">
+                            <% if (conv.user_name) { %>
+                              <%= conv.user_name %>
+                                <span style="font-weight:400; color:var(--color-text-muted); font-size:0.8rem;">
+                                  &lt;<%= conv.user_email %>&gt;
+                                </span>
+                                <% } else { %>
+                                  <span style="color:var(--color-text-muted);">Guest / Anonymous</span>
+                                  <% } %>
+                          </div>
+                          <% if (conv.last_message) { %>
+                            <div class="admin-chat-item__preview">
+                              <%= conv.last_message %>
+                            </div>
+                            <% } %>
+                        </div>
+                        <div
+                          style="display:flex; flex-direction:column; align-items:flex-end; gap:0.4rem; flex-shrink:0;">
+                          <span class="chat-status-badge chat-status-badge--<%= conv.status %>">
+                            <%= conv.status %>
+                          </span>
+                          <span class="admin-chat-item__date">
+                            #<%= conv.id %> &middot;
+                              <%= new Date(conv.updated_at).toLocaleDateString('en-PH', { month:'short', day:'numeric',
+                                year:'numeric' }) %>
+                          </span>
+                        </div>
+                      </a>
+                      <% }); %>
+                  </div>
+                  <% } %>
+
+    </main>
+
+    <%- include('../partials/footer') %>
+      <script src="/js/main.js"></script>
+
+      <script>
+        function filterConvs(status) {
+          const items = document.querySelectorAll('.admin-chat-item');
+          items.forEach(function (item) {
+            item.style.display = (status === 'all' || item.dataset.status === status) ? 'flex' : 'none';
+          });
+          ['all', 'escalated', 'active', 'closed'].forEach(function (s) {
+            const btn = document.getElementById('filter' + s.charAt(0).toUpperCase() + s.slice(1));
+            if (btn) {
+              btn.className = s === status ? 'btn btn--sm btn--primary' : 'btn btn--sm btn--outline';
+            }
+          });
+        }
+      </script>
+</body>
+
+</html>
